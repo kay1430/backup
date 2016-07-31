@@ -16,9 +16,9 @@ CREATE TABLE MEMBER(
 )
 
 INSERT INTO MEMBER
-VALUES('qwer', 'qwer', 'kwon', 'qwer@qwer')
+VALUES('qwer', 'qwer', 'kwon', 'qwer@qwer', 3, 'd')
 INSERT INTO MEMBER
-VALUES('hong', 'hong', 'hong', 'hong@hong')
+VALUES('hong', 'hong', 'hong', 'hong@hong', 3, 'a')
 
 --[2] movie : MV_LIKE : 좋아요, MV_ON : 상영중인영화
 
@@ -97,6 +97,10 @@ VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 1, 10, 10, to_date('16-07-29 12:30:0
 
 INSERT INTO THEATER
 VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 2, 10, 10, to_date('16-07-29 3:00:00','YY-MM-DD HH24:MI:SS'))
+
+INSERT INTO THEATER
+VALUES(TH_SEQ.NEXTVAL, '명동', 1, '3관', 1, 10, 10, to_date('16-07-29 17:30:00','YY-MM-DD HH24:MI:SS'))
+
 
 INSERT INTO THEATER
 VALUES(TH_SEQ.NEXTVAL, '명동', 2, '2관', 1, 10, 10, to_date('16-07-29 13:00:00','YY-MM-DD HH24:MI:SS'))

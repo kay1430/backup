@@ -38,7 +38,10 @@ request.setAttribute("jsonresult", jsonresult); */
 
 <%	// main에서 빼도됌. nav 영역에서 session을 set해줌
 /* MemberDTO mem = new MemberDTO("qwer", "qwer", "qwer", "asdf@asdf"); */
-/* session.setAttribute("login", mem); */
+MemberDTO mem = new MemberDTO();
+mem.setM_id("qwer");
+
+session.setAttribute("login", mem); 
 %>
 
 <%-- nav 에 전체 예매 tab 존재. 따라서, 각 영화의 예매버튼이 존재 --%>

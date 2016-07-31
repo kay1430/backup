@@ -86,7 +86,7 @@ public class TheaterDAO implements ITheater{
 	@Override
 	public List<TheaterDTO> getTh_num(int mv_seq, String th_name, String th_cinema) {
 		
-		String sql = " SELECT TH_NUM, TO_CHAR(TH_TIME, 'YY-MM-DD HH24:MI:SS') FROM THEATER WHERE MV_SEQ=? AND TH_NAME=? AND TH_CINEMA=? ";
+		String sql = " SELECT TH_NUM, TO_CHAR(TH_TIME, 'YYYY-MM-DD HH24:MI:SS') FROM THEATER WHERE MV_SEQ=? AND TH_NAME=? AND TH_CINEMA=? ";
 		
 		Connection conn=null;
 		PreparedStatement psmt = null;

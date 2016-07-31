@@ -46,6 +46,15 @@ System.out.println("seq = " + seq);		// 여기서 받은 seq는 selected가됨
 String th_name = request.getParameter("th_name");	// (0729수정할거)MOVIEDETAIL이나 INDEX에서 넘어올때, NULL값으로 문제될수있음
 System.out.println("th_name = " + th_name);		
 
+int adult, student, elder;
+if(request.getParameter("adult")==null) adult = 0;
+else adult = Integer.parseInt(request.getParameter("adult"));
+if(request.getParameter("student")==null) student = 0;
+else student = Integer.parseInt(request.getParameter("student"));
+if(request.getParameter("elder")==null) elder = 0;
+else elder = Integer.parseInt(request.getParameter("elder"));
+System.out.println("(adult, student, elder) = (" + adult + ","+ student + ","+ elder + ")");
+
 // calendar
 Calendar cal = Calendar.getInstance();	// 오늘날짜
 cal.set(Calendar.DATE, 1);
@@ -122,23 +131,25 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 					th_name_duple[i] = "";
 				}
 				
-				for(int i = 0; i < thlist.size(); i++){ 
-					if(i==0) {%> 
-						<a href="Reserve.jsp?seq=<%=thlist.get(0).getMv_seq()%>&th_name=<%=thlist.get(0).getTh_name() %>"><%=thlist.get(0).getTh_name() %></a><br>
-			<%			th_name_duple[0] = thlist.get(0).getTh_name();
+				for(int i = 0, k = 0; i < thlist.size(); i++){ 
+					
+					boolean flag=false;		// 배열 비교 관련 변수 (true:이미 th_name_duple에 해당 영화관 존재) (false:th_name_duple에 해당 영화관 존재 x)  
+					
+					for(int j = 0; j < i; j++){	
+						if(th_name_duple[j].equals(thlist.get(i).getTh_name()))		// th_name_duple배열에 이미 해당 영화관존재
+							flag = true;
 					}
-					for(int j = 0; j < i; j++){
-						if(!th_name_duple[j].equals(thlist.get(i).getTh_name())){ %>
-							<a href="Reserve.jsp?seq=<%=thlist.get(i).getMv_seq()%>&th_name=<%=thlist.get(i).getTh_name() %>"><%=thlist.get(i).getTh_name() %></a><br>
-					<%		th_name_duple[i] = thlist.get(i).getTh_name();
-							break;
-						}
+					
+					if(!flag){	// 배열에 해당 영화관 X. 따라서, table에 출력과 동시에 th_name_duple에 저장 %>
+						<a href="Reserve.jsp?seq=<%=thlist.get(i).getMv_seq()%>&th_name=<%=thlist.get(i).getTh_name() %>"><%=thlist.get(i).getTh_name() %></a><br>
+					<%	th_name_duple[k] = thlist.get(i).getTh_name();
+						k++;
 					}
-				} %>
+				} %> 
 			<!-- </select> -->
 		</td>
 		<td> <%-- 달력 --%>
-			<table border="1">
+			<table border="1" width="100%">
 				<col width="10"/><col width="10"/><col width="10"/>
 				<col width="10"/><col width="10"/><col width="10"/>
 				<col width="10"/>
@@ -176,7 +187,7 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 					Calendar mysysdate = Calendar.getInstance();	// 오늘날짜 //(0729 수정할거) 만약 오늘날짜가 30일이면 다음달 1일2일까지 예매가능해야함. but, 아직 구현X
 					if(mysysdate.get(Calendar.DATE) == i || (mysysdate.get(Calendar.DATE)+1) == i || (mysysdate.get(Calendar.DATE)+2) == i){	// 오늘날짜~+2까지 예매가능 
 						if(mysysdate.get(Calendar.YEAR) == year && (mysysdate.get(Calendar.MONTH)+1) == month){ %>	
-							<td align="center"><a href="Reserve.jsp?seq=<%=thlist.get(i).getMv_seq()%>&th_name=<%=th_name%>&date=<%=i%>"><%=i %></a></td>
+							<td align="center"><a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=i%>"><%=i %></a></td>
 					<%	}
 					}else{ %>
 						<td align="center"><%=i %></td>
@@ -198,7 +209,7 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 			</table>
 					
 		</td>
-		<td rowspan="2">
+		<td rowspan="3">
 			<table>
 				<tr> <!-- <td colspan="2"><img src="../img/arrow.png" alt="포스터"></td> -->
 					<%	for(int i = 0; i < mlist.size(); i++){
@@ -208,7 +219,7 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 						}%>
 				</tr>
 				<tr>
-					<th colspan="2">제목</th>
+					<th>제목</th>
 					<%	for(int i = 0; i < mlist.size(); i++){
 							if(seq == mlist.get(i).getMv_seq()){ %>
 								<td><%=mlist.get(i).getMv_title() %></td>
@@ -216,8 +227,8 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 						}%>
 				</tr>
 				<tr>
-					<th>극장</th>
-					<td>롯데</td>
+					<th>상영관</th>
+					<td><%=th_name %></td>
 				</tr>
 				<tr>
 					<th>날짜</th>
@@ -225,7 +236,7 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 				</tr>
 				<tr>
 					<th>인원</th>
-					<td>23</td>
+					<td>성인(<%=adult %>) 학생(<%=student %>) 65세(<%=elder %>)</td>
 				</tr>
 				<tr>
 					<th>금액</th>
@@ -242,8 +253,8 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 		<td>인원수</td>
 	</tr>
 	<tr>
-		<td>
-			<table>
+		<td colspan="2">
+			<table width="100%">
 				<tr>	<%-- x관 --%>
 					<% if(th_name!=null){	
 							
@@ -255,19 +266,23 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 							for(int i = 0; i < thlist.size(); i++){ 
 								if(th_name.equals(thlist.get(i).getTh_name())){ 
 									if(i==0) {%> 
-										<td><%=thlist.get(i).getTh_cinema() %></td>
+										<td colspan="2"><%=thlist.get(i).getTh_cinema() %></td></tr><tr>
 								<% 		th_cinema_duple[i] = thlist.get(i).getTh_cinema();
 										List<TheaterDTO> th_numlist = new ArrayList<TheaterDTO>();
 										th_numlist = thdao.getTh_num(seq, th_name, thlist.get(i).getTh_cinema());
-										for(int k = 0; k < th_numlist.size(); k++){	%>
+										for(int k = 0; k < th_numlist.size(); k++){	
+											/* String tmp = th_numlist.get(i).getTh_time(); */
+
+										%>
 											<td><%=th_numlist.get(i).getTh_time()%></td>
-						<%				}
-									}
-									for(int j = 0; j < i; j++){
+						<%				}%>
+										</tr><tr>
+								<%	}
+									for(int j = 0; j < i; j++){ // (07.31수정할거)timestamp에서 시간만 잘라내야함. 아직구현X
 										if(!th_cinema_duple[j].equals(thlist.get(i).getTh_cinema())){	%>
-											<td colspan="2"><%=thlist.get(i).getTh_cinema() %></td>
+											<td colspan="2"><%=thlist.get(i).getTh_cinema() %></td></tr><tr>
 						<%					th_cinema_duple[i] = thlist.get(i).getTh_cinema();	%>
-											<td><%=thlist.get(i).getTh_num() %></td>
+											<td><%=thlist.get(i).getTh_time() %></td>
 						<%					break;
 										}
 									}
@@ -275,31 +290,41 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 							}
 						}%>
 				</tr>
-
-			
 			</table>
 		
 			
 		</td>
 		<td>
-			<table>
+			<table width="100%">
 				<tr>
-					<th>성인</th>
+					<th colspan="8">성인</th>
+				</tr>
+				<tr>	<%-- 시간표 선택했을 때, 시간도 넘겨줘야함. 아직 a로 넘겨주는변수 포함안시켯음. (0731 수정할거) --%>
+				<%	for(int i = 1; i < 9; i++){ %>
+						<td align="center">
+							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&adult=<%=i%>&student=<%=student%>&elder=<%=elder%>"><%=i %></a>
+						</td>
+				<%	} %>
 				</tr>
 				<tr>
-					<td></td>
+					<th colspan="8">학생</th>
 				</tr>
 				<tr>
-					<th>학생</th>
+				<%	for(int i = 1; i < 9; i++){ %>
+						<td align="center">
+							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&adult=<%=adult%>&student=<%=i%>&elder=<%=elder%>"><%=i %></a>
+						</td>
+				<%	} %>
 				</tr>
 				<tr>
-					<td></td>
+					<th colspan="8">65세이상</th>
 				</tr>
 				<tr>
-					<th>65세이상</th>
-				</tr>
-				<tr>
-					<td></td>
+				<%	for(int i = 1; i < 9; i++){ %>
+						<td align="center">
+							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&adult=<%=adult%>&student=<%=student%>&elder=<%=i%>"><%=i %></a>
+						</td>
+				<%	} %>
 				</tr>
 				
 			</table>
@@ -317,7 +342,7 @@ String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/
 
 
 
-
+<a href="Index.jsp">HOME</a>
 
 
 
