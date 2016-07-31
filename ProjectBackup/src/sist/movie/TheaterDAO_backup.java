@@ -9,12 +9,12 @@ import java.util.List;
 
 import sist.co.DBManager.DBManager;
 
-public class TheaterDAO implements ITheater{
+public class TheaterDAO_backup implements ITheater{
 
 	private boolean isS = true;
-	private static TheaterDAO TheaterDao;
+	private static TheaterDAO_backup TheaterDao;
 	
-	public TheaterDAO() {
+	public TheaterDAO_backup() {
 	
 	}
 
@@ -31,9 +31,9 @@ public class TheaterDAO implements ITheater{
 	}
 
 	
-	public static TheaterDAO getInstance(){						// Singleton에 해당
+	public static TheaterDAO_backup getInstance(){						// Singleton에 해당
 		if(TheaterDao == null){
-			TheaterDao = new TheaterDAO();
+			TheaterDao = new TheaterDAO_backup();
 		}
 		return TheaterDao;
 	}
@@ -86,7 +86,7 @@ public class TheaterDAO implements ITheater{
 	@Override
 	public List<TheaterDTO> getTh_num(int mv_seq, String th_name, String th_cinema) {
 		
-		String sql = " SELECT TH_SEQ, TH_NUM, TO_CHAR(TH_TIME, 'YYYY-MM-DD HH24:MI:SS') FROM THEATER WHERE MV_SEQ=? AND TH_NAME=? AND TH_CINEMA=? ";
+		String sql = " SELECT TH_NUM, TO_CHAR(TH_TIME, 'YYYY-MM-DD HH24:MI:SS') FROM THEATER WHERE MV_SEQ=? AND TH_NAME=? AND TH_CINEMA=? ";
 		
 		Connection conn=null;
 		PreparedStatement psmt = null;
@@ -104,9 +104,10 @@ public class TheaterDAO implements ITheater{
 			rs = psmt.executeQuery();
 			while(rs.next()){
 				TheaterDTO thdto = new TheaterDTO();
-				thdto.setTh_seq(rs.getInt(1));
-				thdto.setTh_num(rs.getInt(2));
-				thdto.setTh_time(rs.getTimestamp(3));
+				thdto.setTh_num(rs.getInt(1));
+				System.out.println("into:"+thdto.getTh_num());
+				thdto.setTh_time(rs.getTimestamp(2));
+				System.out.println("into:"+thdto.getTh_time());
 				
 				thlist.add(thdto);
 			}
