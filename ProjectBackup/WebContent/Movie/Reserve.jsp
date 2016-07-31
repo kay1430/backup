@@ -25,16 +25,16 @@ th,td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
-th.headleft{
+.headleft{
 	text-align: left;
-	border: 0px;
+	border-right: 0px;
 }
 td.eachone{
 	color: gray;
 	font-size: 11px;
 	text-align: right;
 	vertical-align: center;
-	border: 0px;
+	border-left: 0px;
 }
 </style>
 </head>
@@ -45,6 +45,56 @@ public boolean nvl(String msg){
 }
 public String timestamp2string(Timestamp t){ 	// timestamp를 String으로 변환
 	return (""+t+"").substring(11, 16);
+}
+public List<TheaterDTO> getTheaterMatch(List<TheaterDTO> thelist, int seq, String th_name, String th_cinema){ // 시간표 출력시 해당 영화의 상영관 출력에 이용
+	List<TheaterDTO> result = new ArrayList<TheaterDTO>();
+	for(int i = 0; i < thelist.size(); i++){
+		if(thelist.get(i).getMv_seq() == seq && th_name.equals(thelist.get(i).getTh_name()) && th_cinema.equals(thelist.get(i).getTh_cinema())){
+			result.add(thelist.get(i));
+		}
+	}
+	return result;
+}
+public int getleftseat(List<TheaterDTO> thelist, int th_seq){	// 잔여석
+	for(int i = 0; i < thelist.size(); i++){
+		if(th_seq == thelist.get(i).getTh_seq()){
+			return thelist.get(i).getTh_leftseat();
+		}
+	}
+	return -1;
+}
+public int getPrice(List<PriceDTO> plist, String man){		// 가격표 
+	for(int i = 0; i < plist.size(); i++){
+		if(plist.get(i).getP_grade().equals(man)) 
+			return plist.get(i).getP_price();
+	}
+	return -1;
+}
+public int getTotalPrice(List<PriceDTO> plist, int adult, int student, int elder){	// 총 가격
+	int price = 0;
+	for(int i = 0; i < plist.size(); i++){
+		if(plist.get(i).getP_grade().equals("adult"))			price+=adult*plist.get(i).getP_price();
+		else if(plist.get(i).getP_grade().equals("student"))	price+=student*plist.get(i).getP_price();
+		else if(plist.get(i).getP_grade().equals("elder"))		price+=elder*plist.get(i).getP_price();
+	}	
+	return price;
+}
+public MovieDTO getMovieDTO(List<MovieDTO> mlist, int seq){
+	MovieDTO mvdto = new MovieDTO();
+	for(int i = 0; i < mlist.size(); i++){
+		if(seq == mlist.get(i).getMv_seq()){
+			mvdto = mlist.get(i);
+		}
+	}
+	return mvdto;
+}
+public String getChooseTime(List<TheaterDTO> thelist, int th_seq){	// 고객이 선택한 시간 추출 => 선택한 걸 보여주는 table 및 예매 데이터(예매 상영시간) 저장시 사용
+	for(int i = 0; i < thelist.size(); i++){
+		if(th_seq == thelist.get(i).getTh_seq()){
+			return timestamp2string(thelist.get(i).getTh_time());
+		}
+	}
+	return "";
 }
 %>
 
@@ -57,17 +107,26 @@ if(ologin==null){
 	mem = (MemberDTO)ologin;
 }
 
-/* String sseq = request.getParameter("seq");
+/*[1] String sseq = request.getParameter("seq");
 int seq = Integer.parseInt(sseq);
 System.out.println("seq = " + seq);		// 여기서 받은 seq는 selected가됨
 */
+//[2]
 int seq;
 if(request.getParameter("seq")==null) seq = 0;
 else seq = Integer.parseInt(request.getParameter("seq"));
 System.out.println("seq = " + seq);		// 여기서 받은 seq는 selected가됨
 
+/* //[1]
 String th_name = request.getParameter("th_name");	// (0729수정할거)MOVIEDETAIL이나 INDEX에서 넘어올때, NULL값으로 문제될수있음
 System.out.println("th_name = " + th_name);		
+ */
+//[2] (0731 수정할거) (1) 영화 제목선택x. 상영관 선택x, 달력 선택o. (2)영화 제목선택o, 상영관 선택x, 달력선택o : 이경우들에서, 상영관이 null이 넘어가는데 고쳐야함
+String th_name;
+if(request.getParameter("th_name")==null) th_name = "";
+else th_name = request.getParameter("th_name");
+System.out.println("th_name = " + th_name);	
+
 
 	
 int th_seq; 	// 시간 선택
@@ -110,22 +169,18 @@ cal.set(year, month-1, 1);
 
 // 요일(1 ~ 7) 1:일요일
 int dayOfWeek=cal.get(Calendar.DAY_OF_WEEK);	// 6
+String pp=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/left.gif'/></a>", "Reserve.jsp", seq, year-1, month);
+String p=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/prec.gif'/></a>", "Reserve.jsp", seq, year, month-1);
+String nn=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/last.gif'/></a>", "Reserve.jsp", seq, year+1, month);
+String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/next.gif'/></a>", "Reserve.jsp", seq, year, month+1);
 
-String pp=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/left.gif'/></a>", 
-			"Reserve.jsp", seq, year-1, month);
-
-String p=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/prec.gif'/></a>", 
-		"Reserve.jsp", seq, year, month-1);
-
-String nn=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/last.gif'/></a>", 
-		"Reserve.jsp", seq, year+1, month);
-
-String n=String.format("<a href='./%s?seq=%d&year=%d&month=%d'><img src='../img/next.gif'/></a>", 
-		"Reserve.jsp", seq, year, month+1);
-
-// 가격 data 불러오기
+// 가격표 Data 취득
 PriceDAO pdao = PriceDAO.getInstance();
 List<PriceDTO> plist = pdao.getPriceList();
+
+// Movie Data 취득
+MovieDAO mdao = MovieDAO.getInstance();
+List<MovieDTO> mlist = mdao.getOnMovieList();
 %>
 
 <form action="ReserveAf.jsp">
@@ -139,12 +194,7 @@ List<PriceDTO> plist = pdao.getPriceList();
 	<tr>
 		<td width="250px">
 			<!-- <select size="10" name="mv_title_selec" >	 -->
-				<%
-				MovieDAO mdao = MovieDAO.getInstance();
-				List<MovieDTO> mlist = new ArrayList<MovieDTO>();
-				mlist = mdao.getOnMovieList();
-				
-				for(int i = 0; i < mlist.size(); i++){ %>
+			<%	for(int i = 0; i < mlist.size(); i++){ %>
 					<%-- <option <%
 						if(seq==mlist.get(i).getMv_seq()){	%>
 							selected="selected"
@@ -241,30 +291,22 @@ List<PriceDTO> plist = pdao.getPriceList();
 			</table>
 					
 		</td>
-		<td rowspan="3">
-			<table>
+		<td rowspan="3" width="225px" align="center">
+			<table width="100%" height="100%">
 				<tr> <!-- <td colspan="2"><img src="../img/arrow.png" alt="포스터"></td> -->
 					<%	if(seq == 0){ %>
 							<td colspan="2"><img src="../img/emptyposter.jpg"></td>
-					<%	}else{	
-							for(int i = 0; i < mlist.size(); i++){
-								if(seq == mlist.get(i).getMv_seq()){ %>
-									<td colspan="2"><img src="<%=mlist.get(i).getMv_img() %>"></td>
-						<%		}
-							}
-						}%>
+					<%	}else{	%>
+							<td colspan="2"><img src="<%=getMovieDTO(mlist, seq).getMv_img()%>"></td>
+					<%	}%>
 				</tr>
 				<tr>
 					<th>제목</th>
 					<%	if(seq == 0){ %>
-						<td>영화를 선택하세요</td>
-					<%	}else{
-							for(int i = 0; i < mlist.size(); i++){
-								if(seq == mlist.get(i).getMv_seq()){ %>
-									<td><%=mlist.get(i).getMv_title() %></td>
-							<%	}
-							}
-						}%>
+							<td>영화를 선택하세요</td>
+					<%	}else{ %>
+							<td><%=getMovieDTO(mlist, seq).getMv_title()%></td>
+					<%	} %>
 				</tr>
 				<tr>
 					<th>상영관</th>
@@ -279,7 +321,7 @@ List<PriceDTO> plist = pdao.getPriceList();
 					<%	if(sdate == null){ %>
 							<td>관람일을 선택하세요</td>
 					<%	}else{ %>
-							<td><%=year %>-<%=month %>-<%=sdate %></td>
+							<td><%=year %>-<%=month %>-<%=sdate %> <%=getChooseTime(thlist, th_seq) %></td>
 					<%	} %>
 				</tr>
 				<tr>
@@ -290,19 +332,22 @@ List<PriceDTO> plist = pdao.getPriceList();
 					<th>금액</th>
 					<%	if((adult + student + elder) == 0){ %>
 							<td>인원을 선택하세요</td>
-					<%	}else{	
-							int price = 0;
-							
-							for(int i = 0; i < plist.size(); i++){
-								if(plist.get(i).getP_grade().equals("adult"))			price+=adult*plist.get(i).getP_price();
-								else if(plist.get(i).getP_grade().equals("student"))	price+=student*plist.get(i).getP_price();
-								else if(plist.get(i).getP_grade().equals("elder"))		price+=elder*plist.get(i).getP_price();
-							}	%>
-							<td><%=price %></td>
+					<%	}else{ %>
+							<td><%=getTotalPrice(plist, adult, student, elder) %></td>
 					<%	} %>
 				</tr>
 				<tr>
-					<th colspan="2"><input type="submit" value="예매하기"></th>
+					<th>잔여석</th>
+					<td colspan="2">
+					<% if(th_seq == 0){ %>
+							관람시간을 선택하세요
+					<%	}else{ %>
+							<%=getleftseat(thlist, th_seq) %>석
+					<%	}	%>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center"><input type="submit" value="예매하기"></td>
 				</tr>
 			</table>
 		</td>
@@ -315,7 +360,7 @@ List<PriceDTO> plist = pdao.getPriceList();
 		<td colspan="2">
 			<table width="100%">
 				<tr>	<%-- x관 --%>
-					<% if(th_name!=null){	
+					<% if(sdate != null && th_name!=null){	
 							
 							String th_cinema_duple[] = new String[thlist.size()];	// 해당영화 상영을 명동 1관 1회 2회일 경우, 1관이 두번 나오기떄문에, 한번만 나오도록함
 							for(int i = 0; i < th_cinema_duple.length; i++){		// 초기화. 초기화안시키면 null이라 다음 for문에서 오류남
@@ -326,8 +371,11 @@ List<PriceDTO> plist = pdao.getPriceList();
 								if(th_name.equals(thlist.get(i).getTh_name())){ 
 									
 									boolean flag=false;	
-									List<TheaterDTO> th_numlist = new ArrayList<TheaterDTO>(); 
-									th_numlist = thdao.getTh_num(seq, th_name, thlist.get(i).getTh_cinema());
+									
+									List<TheaterDTO> th_numlist = new ArrayList<TheaterDTO>();  
+									// (1) sql  th_numlist = thdao.getTh_num(seq, th_name, thlist.get(i).getTh_cinema()); 
+									// (2) 메소드
+									th_numlist = getTheaterMatch(thlist, seq, th_name, thlist.get(i).getTh_cinema());
 									
 									for(int j = 0; j < i; j++){	
 										if(th_cinema_duple[j].equals(thlist.get(i).getTh_cinema()))		// th_name_duple배열에 이미 해당 영화관존재
@@ -336,10 +384,11 @@ List<PriceDTO> plist = pdao.getPriceList();
 								
 									// 출력 
 								 	if(!flag){ %>
-										<td colspan="2"><%=thlist.get(i).getTh_cinema() %></td></tr><tr>
+										<%-- <td colspan="2"><%=thlist.get(i).getTh_cinema() %>(총 <%=thlist.get(i).getTh_totalseat() %>석)</td></tr><tr> --%>
+										<td class="headleft"><%=thlist.get(i).getTh_cinema() %></td><td class="eachone">(총 <%=thlist.get(i).getTh_totalseat() %>석)</td></tr><tr>
 									<% 	for(int j = 0; j < th_numlist.size(); j++){%>
 											<%-- <td><%=timestamp2string(th_numlist.get(j).getTh_time()) %></td> --%>
-											<td>
+											<td align="center">
 												<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_numlist.get(j).getTh_seq()%>"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></a>
 											</td>
 									<%	}%>
@@ -359,46 +408,46 @@ List<PriceDTO> plist = pdao.getPriceList();
 			<table width="100%">
 				<tr>
 					<th colspan="5" class="headleft">성인</th>
-					<%	for(int i = 0; i < plist.size(); i++){
-							if(plist.get(i).getP_grade().equals("adult")){	%>
-								<td class="eachone" colspan="3">1매/<%=plist.get(i).getP_price()%>원</td>
-					<%		}
-						}%>
+					<td class="eachone" colspan="3">1매/<%=getPrice(plist, "adult")%>원</td>
 				</tr>
 				<tr>
 				<%	for(int i = 1; i < 9; i++){ %>
 						<td align="center">
-							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=i%>&student=<%=student%>&elder=<%=elder%>"><%=i %></a>
+						<%	if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다%>
+								<%=i %>
+						<%	}else{ %>
+								<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=i%>&student=<%=student%>&elder=<%=elder%>"><%=i %></a>
+						<%	} %>
 						</td>
 				<%	} %>
 				</tr>
 				<tr>
 					<th colspan="5" class="headleft">학생</th>
-					<%	for(int i = 0; i < plist.size(); i++){
-							if(plist.get(i).getP_grade().equals("adult")){	%>
-								<td class="eachone" colspan="3">1매/<%=plist.get(i).getP_price()%>원</td>
-					<%		}
-						}%>
+					<td class="eachone" colspan="3">1매/<%=getPrice(plist, "student")%>원</td>
 				</tr>
 				<tr>
 				<%	for(int i = 1; i < 9; i++){ %>
 						<td align="center">
+						<%	if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다%>
+								<%=i %>
+						<%	}else{ %>
 							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=adult%>&student=<%=i%>&elder=<%=elder%>"><%=i %></a>
+						<%	} %>
 						</td>
 				<%	} %>
 				</tr>
 				<tr>
 					<th colspan="5" class="headleft">우대(65세이상)</th>
-					<%	for(int i = 0; i < plist.size(); i++){
-							if(plist.get(i).getP_grade().equals("adult")){	%>
-								<td class="eachone" colspan="3">1매/<%=plist.get(i).getP_price()%>원</td>
-					<%		}
-						}%>
+					<td class="eachone" colspan="3">1매/<%=getPrice(plist, "elder")%>원</td>
 				</tr>
 				<tr>
 				<%	for(int i = 1; i < 9; i++){ %>
 						<td align="center">
+						<%	if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다%>
+								<%=i %>
+						<%	}else{ %>
 							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=adult%>&student=<%=student%>&elder=<%=i%>"><%=i %></a>
+						<%	} %>
 						</td>
 				<%	} %>
 				</tr>
@@ -406,10 +455,6 @@ List<PriceDTO> plist = pdao.getPriceList();
 			</table>
 		</td>
 	</tr>
-
-
-
-
 
 </table>
 
@@ -420,32 +465,6 @@ List<PriceDTO> plist = pdao.getPriceList();
 
 <a href="Index.jsp">HOME</a>
 <a href="Reserve.jsp">예매다시하기</a>
-
-
-
-
-
-
-	<%-- x관 부분 (0731 수정전) 
-		<%		if(i==0) {%> 
-				<td colspan="2"><%=thlist.get(i).getTh_cinema() %></td></tr><tr>
-			<%	th_cinema_duple[i] = thlist.get(i).getTh_cinema();
-				List<TheaterDTO> th_numlist = new ArrayList<TheaterDTO>();
-				th_numlist = thdao.getTh_num(seq, th_name, thlist.get(i).getTh_cinema());
-				for(int k = 0; k < th_numlist.size(); k++){	%>
-					<td><%=timestamp2string(thlist.get(i).getTh_time()) %></td>
-			<%	}%>
-				</tr><tr>
-		<%	}
-			for(int j = 0; j < i; j++){ 
-				if(!th_cinema_duple[j].equals(thlist.get(i).getTh_cinema())){	%>
-					<td colspan="2"><%=thlist.get(i).getTh_cinema() %></td></tr><tr>
-				<%	th_cinema_duple[i] = thlist.get(i).getTh_cinema(); %>
-					<td><%=timestamp2string(thlist.get(i).getTh_time()) %></td>
-				<%	break;
-				}
-		}%> --%>
-
 
 
 </body>

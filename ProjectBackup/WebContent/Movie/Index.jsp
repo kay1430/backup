@@ -47,7 +47,7 @@ session.setAttribute("login", mem);
 <%-- nav 에 전체 예매 tab 존재. 따라서, 각 영화의 예매버튼이 존재 --%>
 <%-- (수정할거1)예매할 때, 로그인했는지 안했는지 판단해야함. 따라서, session 변수저장되어있는지로 확인하기 --%>
 <form action="Reserve.jsp">
-	<input type="hidden" name="seq" value="<%=1 %>">
+	<input type="hidden" name="seq" value="<%=0 %>">
 	<input type="submit" value="예매" style="width: 100px">	
 </form>
 
