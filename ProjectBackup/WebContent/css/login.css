@@ -1,0 +1,61 @@
+@CHARSET "UTF-8";
+
+.btn-set { 
+    /*버튼 크기*/
+    padding: 9px 14px; 
+	font-size: 15px; 
+	font-weight: bold; /*두꼐*/
+	line-height: normal; 
+	border-radius: 5px;
+    
+    /*버튼 색상*/
+    color:#ffffff;
+    background-color: #C8C8C8;
+	border: 1px solid #3762bc;
+	
+	/*3개 버튼 정렬*/
+	width: 100%; display:block; 
+	
+}
+
+.btn-set:hover, 
+.btn-set:active  { /*마우스 오버했을때  / 클릭했을때 링크상태*/
+	background-color: #4a77d4; 
+}
+
+ 
+ * { 
+    box-sizing:border-box; 
+ } /*id,pw 텍스트필드 너비를 버튼 너비만큼 맞춤*/
+
+
+
+.loginA { 
+	position: absolute; /*상위요소 기준으로 위치 조정됨*/
+	top: 50%;
+	left: 50%;
+	margin: -150px 0 0 -150px;
+	width:300px;
+	height:300px;
+}
+
+.loginA h1 { 
+	color: #000; 
+	letter-spacing:1px;  /*자간*/ 
+	text-align:center; 
+	text-shadow: 0 0 10px rgba(0,0,0,0.3);  /*그림자효과*/
+}
+
+input { 
+	width: 100%;
+	margin-bottom: 10px; 
+	border: none;
+	outline: none;   /*테두리 위치 : outline > border*/
+	padding: 10px;
+	font-size: 13px;
+	color: #000;
+	border-radius: 10px; /*모서리를 둥글게*/
+}
+
+/*텍스트필드를 클릭했을때*/
+input:focus { background-color:	#EBFBFF}
