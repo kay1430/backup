@@ -120,6 +120,44 @@ public class TheaterDAO implements ITheater{
 		
 		return thlist;
 	}
+
+	@Override
+	public TheaterDTO getTheaterinform(int th_seq) {
+		String sql = " SELECT * FROM THEATER WHERE TH_SEQ=? ";
+		
+		Connection conn=null;
+		PreparedStatement psmt = null;
+		ResultSet rs = null;
+		
+		TheaterDTO thdto = new TheaterDTO();
+
+		try {
+			conn = DBManager.getConnection();
+			psmt=conn.prepareStatement(sql);
+			psmt.setInt(1, th_seq);
+			
+			
+			rs = psmt.executeQuery();
+			while(rs.next()){
+				int i = 1;
+				thdto.setTh_seq(rs.getInt(i++));
+				thdto.setTh_name(rs.getString(i++));
+				thdto.setMv_seq(rs.getInt(i++));
+				thdto.setTh_cinema(rs.getString(i++));
+				thdto.setTh_num(rs.getInt(i++));
+				thdto.setTh_totalseat(rs.getInt(i++));
+				thdto.setTh_leftseat(rs.getInt(i++));
+				thdto.setTh_time(rs.getTimestamp(i++));
+			}
+			
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}finally{
+			DBManager.close(conn, psmt);
+		}
+		return thdto;
+	}
 	
 
 	
