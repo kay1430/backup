@@ -3,7 +3,7 @@ package sist.movie;
 import java.util.Date;
 
 public class MovieDTO {
-
+  
 	private int mv_seq;
 	private String mv_title;
 	private Date mv_openday;
@@ -15,6 +15,7 @@ public class MovieDTO {
 	private float mv_hate;	// hate/총 예매
 	private int mv_on;		// 상영여부(1:상영, 0:X)
 	
+
 	public MovieDTO() {
 		
 	}
