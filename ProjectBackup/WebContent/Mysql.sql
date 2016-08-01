@@ -1,4 +1,4 @@
-
+ 
 --[1] member
 
 DROP TABLE MEMBER
@@ -12,13 +12,13 @@ CREATE TABLE MEMBER(
 	M_NAME VARCHAR2(100) NOT NULL,
 	M_EMAIL VARCHAR2(200) NOT NULL,
 	M_AUTH NUMBER NOT NULL,
-	M_PHOTO VARCHAR2(100) NOT NULL
+	M_PHOTO VARCHAR2(100)
 )
 
 INSERT INTO MEMBER
-VALUES('qwer', 'qwer', 'kwon', 'qwer@qwer', 3, 'd')
+VALUES('qwer', 'qwer', 'kwon', 'qwer@qwer')
 INSERT INTO MEMBER
-VALUES('hong', 'hong', 'hong', 'hong@hong', 3, 'a')
+VALUES('hong', 'hong', 'hong', 'hong@hong')
 
 --[2] movie : MV_LIKE : 좋아요, MV_ON : 상영중인영화
 
@@ -99,10 +99,6 @@ INSERT INTO THEATER
 VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 2, 10, 10, to_date('16-07-29 3:00:00','YY-MM-DD HH24:MI:SS'))
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '명동', 1, '3관', 1, 10, 10, to_date('16-07-29 17:30:00','YY-MM-DD HH24:MI:SS'))
-
-
-INSERT INTO THEATER
 VALUES(TH_SEQ.NEXTVAL, '명동', 2, '2관', 1, 10, 10, to_date('16-07-29 13:00:00','YY-MM-DD HH24:MI:SS'))
 
 INSERT INTO THEATER
@@ -114,31 +110,25 @@ VALUES(TH_SEQ.NEXTVAL, '신촌', 3, '1관', 1, 10, 10, to_date('16-07-29 10:00:0
 INSERT INTO THEATER
 VALUES(TH_SEQ.NEXTVAL, '강남', 1, '1관', 1, 10, 10, to_date('16-07-29 20:00:00','YY-MM-DD HH24:MI:SS'))
 
-INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '강남', 4, '1관', 1, 10, 10, to_date('20160729123000','YYYYMMDDHH24MISS'))
-
-
 
 --[4] SEAT : 좌석 수 == COLUMN 수 
 
 DROP TABLE SEAT
 CASCADE CONSTRAINT;
 
-SELECT * FROM SEAT
+DROP SEQUENCE S_SEQ; 
 
+SELECT * FROM SEAT
+ 
 CREATE TABLE SEAT(
+	S_SEQ NUMBER PRIMARY KEY,
 	TH_SEQ NUMBER NOT NULL,
-	S1 NUMBER NOT NULL,
-	S2 NUMBER NOT NULL,
-	S3 NUMBER NOT NULL,
-	S4 NUMBER NOT NULL,
-	S5 NUMBER NOT NULL,
-	S6 NUMBER NOT NULL,
-	S7 NUMBER NOT NULL,
-	S8 NUMBER NOT NULL,
-	S9 NUMBER NOT NULL,
-	S10 NUMBER NOT NULL
+	S_NAME VARCHAR2(50) NOT NULL,
+	S_CHECK NUMBER(1)
 )
+
+CREATE SEQUENCE S_SEQ
+START WITH 1 INCREMENT BY 1
 
 
 ALTER TABLE SEAT 
@@ -164,7 +154,12 @@ CREATE TABLE RESERVATION(
 	R_TOTALPRICE NUMBER NOT NULL,
 	R_ADULT NUMBER NOT NULL,
 	R_STUDENT NUMBER NOT NULL,
-	R_ELDER NUMBER NOT NULL
+	R_ELDER NUMBER NOT NULL,
+	R_SEAT VARCHAR2(50) NOT NULL,
+	R_TIME DATE NOT NULL,
+	R_VIEWTIME DATE NOT NULL,
+	R_THNAME VARCHAR2(100) NOT NULL,
+	R_CINEMA VARCHAR2(500) NOT NULL
 )
 
 CREATE SEQUENCE R_SEQ
@@ -182,8 +177,7 @@ ALTER TABLE RESERVATION
 ADD CONSTRAINT FK_RESERVATION_MV_SEQ FOREIGN KEY(MV_SEQ)
 REFERENCES MOVIE(MV_SEQ);
 
-INSERT INTO RESERVATION
-VALUES(R_SEQ.NEXTVAL, 'qwer', 2, 1, 0, 10000, 1, 0, 0)
+
 
 --[6] PRICE : 영화가격표 // P_GRADE : ADULT, STUDENT, ELDER
 
@@ -202,11 +196,6 @@ CREATE TABLE PRICE(
 
 CREATE SEQUENCE P_SEQ
 START WITH 1 INCREMENT BY 1
-
-
-INSERT INTO PRICE VALUES(P_SEQ.NEXTVAL, 'adult', '10000')
-INSERT INTO PRICE VALUES(P_SEQ.NEXTVAL, 'student', '8000')
-INSERT INTO PRICE VALUES(P_SEQ.NEXTVAL, 'elder', '5000')
 
 -- [7] FRIEND : (SNS)
 
@@ -233,7 +222,8 @@ CREATE TABLE REVIEW(
 	r_content varchar2(3000) not null,
 	r_writedate date default sysdate,
 	r_like number default 0,
-	r_readcount number default 0
+	r_readcount number default 0,
+	r_star number
 )
 
 alter table REVIEW
@@ -248,7 +238,7 @@ drop sequence review_seq;
 create sequence review_seq
 start with 1 increment by 1;
 
-
+select * from review where r_title like '%ㅋㅋ';
 
 insert into review (r_seq,m_id,r_title,r_content) values (review_seq.nextval,'hong','안녕하세요1','안녕하세요1');
 insert into review (r_seq,m_id,r_title,r_content) values (review_seq.nextval,'hong','안녕하세요2','안녕하세요2');

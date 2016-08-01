@@ -15,7 +15,7 @@ public class MemberDAO implements iMember {
 	private boolean isS = true;
 	private static MemberDAO memberDAO;
 	
-	MemberDTO dto = new MemberDTO();
+	
 	public static MemberDAO getInstance(){
 		if(memberDAO==null){
 			memberDAO = new MemberDAO();
@@ -24,17 +24,17 @@ public class MemberDAO implements iMember {
 	}
 	
 	@Override
-	public boolean AddMember(MemberDTO dto) {
+	public int AddMember(MemberDTO dto) {
 		String sql = " INSERT INTO MEMBER "
-					+ " (M_ID, M_PW, M_NAME, M_EMAIL, M_AUTH) "
-					+ " VALUES(?,?,?,?, 3) ";
+					+ " (M_ID, M_PW, M_NAME, M_EMAIL, M_AUTH,m_photo) "
+					+ " VALUES(?,?,?,?, 3,?) ";
 		
+		int result=-1;
+		String m_photo = " ";
 		Connection conn = null;
 		PreparedStatement psmt = null;
 		ResultSet rs = null;
-		
-		int count = 0;
-		
+
 		try{
 			conn = DBManager.getConnection();
 			log("2/5 Success addMember");
@@ -45,20 +45,20 @@ public class MemberDAO implements iMember {
 			psmt.setString(3, dto.getM_name());
 			psmt.setString(4, dto.getM_email());
 			
-			System.out.println("dto:" + dto.toString());
-			log("3/5 Success addMember");
+			if(dto.getM_photo() != null){
+				m_photo=dto.getM_photo();
+			}
 			
-			count = psmt.executeUpdate();
-			log("4/5 Success addMember");
+			psmt.setString(5, m_photo);
+			result = psmt.executeUpdate();
 		}
 		catch(SQLException e){
-			log("Fail addMember", e);
+			System.out.println(e.getMessage());
 		}
 		finally{
 			DBManager.close(conn, psmt, rs);
-			log("5/5 Success addMember");
 		}
-		return count>0?true:false;
+		return result;
 	}
 	
 	@Override
@@ -152,9 +152,10 @@ public class MemberDAO implements iMember {
 	}
 
 	@Override
-	public MemberDTO login(MemberDTO dto) {
-		String sql = " SELECT M_ID, M_NAME, M_EMAIL, M_AUTH FROM MEMBER "
-					+ " WHERE M_ID=? AND M_PW=? ";
+	public int login(String m_id, String m_pw) {
+		String sql = "select m_pw from Member where m_id=?";
+		
+		int result = -1;
 		
 		Connection conn = null;
 		PreparedStatement psmt = null;
@@ -163,41 +164,82 @@ public class MemberDAO implements iMember {
 		MemberDTO mem = null;
 		try{
 			conn = DBManager.getConnection();
-			log("2/6 Success login");
 			psmt=conn.prepareStatement(sql);
-			psmt.setString(1, dto.getM_id());
-			psmt.setString(2, dto.getM_pw());
-			log("3/6 Success login");
-			
+			psmt.setString(1, m_id);
+
 			rs = psmt.executeQuery();
-			log("4/6 Success login");
 			
 			while(rs.next()){
-				String id = rs.getString(1);
-				String name = rs.getString(2);
-				String email = rs.getString(3);
-				int auth = rs.getInt(4);
-				mem = new MemberDTO();
-				mem.setM_id(id);
-				mem.setM_pw(null);
-				mem.setM_name(name);
-				mem.setM_email(email);
-				mem.setM_auth(auth);
-				
-				mem.toString();
+				if(rs.getString("m_pw").equals(m_pw)){
+					//나중에 admin 계정 아이디 비밀번호 필요할시 여기서 조건문
+					
+					//입력받은 m_id 와 m_pw 가 모두 일치
+					//1을 리턴함  -->무엇이 잘못됐는지 확인가능
+					result = 1;	
+				}else{
+					//아이디는 일치하나 비밀번호가 틀렸을 경우
+					result = 0;
+				}
 			}
-			log("5/6 Success login");
+			//이 모든 조건이 실행 안되면 -1 을 리턴
 		}
 		catch(SQLException e){
-			log("Fail login",e);
+			System.out.println(e.getMessage());
 		}
 		finally{
 			DBManager.close(conn, psmt, rs);
 			log("6/6 Success login");
 		}
-		return mem;
+		return result;
 	}
 
+	//이 메서드는 로그인이 확인되면 member 테이블 정보를 모아온다.
+	
+	@Override
+	public MemberDTO selectMemberDTO(String m_id) {
+		MemberDTO memberdto = null;
+		
+		String sql = "select * from member where m_id = ?";
+		
+		Connection conn= null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, m_id);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+				memberdto = new MemberDTO();
+				int i =1;
+				memberdto.setM_id(rs.getString(i++));
+				memberdto.setM_pw(rs.getString(i++));
+				memberdto.setM_name(rs.getString(i++));
+				memberdto.setM_email(rs.getString(i++));
+				memberdto.setM_auth(rs.getInt(i++));
+				memberdto.setM_photo(rs.getString(i++));
+				
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}finally{
+			DBManager.close(conn, pstmt, rs);
+			
+		}
+		
+		
+		return memberdto;
+	}
+	
+	
+	
+	
+	
 	public void log(String msg){
 		if(isS){
 			System.out.println(getClass() + ": "+ msg);
@@ -210,4 +252,5 @@ public class MemberDAO implements iMember {
 		
 		}
 	}
+
 }

@@ -7,6 +7,7 @@ public class MemberDTO {
 	private String m_name;
 	private String m_email;
 	private int m_auth;
+	private String m_photo;
 	
 	public MemberDTO() {}
 	
@@ -49,11 +50,22 @@ public class MemberDTO {
 	public void setM_auth(int m_auth) {
 		this.m_auth = m_auth;
 	}
-	
-	public String toString(){
-		return "MEMBER[m_id:" + m_id + ",m_pw:" + m_pw + ",m_name:"
-				+ m_name + ",m_email:" + m_email + ",m_auth:" + m_auth + "]"; 
+
+	public String getM_photo() {
+		return m_photo;
 	}
+
+	public void setM_photo(String m_photo) {
+		this.m_photo = m_photo;
+	}
+
+	@Override
+	public String toString() {
+		return "MemberDTO [m_id=" + m_id + ", m_pw=" + m_pw + ", m_name=" + m_name + ", m_email=" + m_email
+				+ ", m_auth=" + m_auth + ", m_photo=" + m_photo + "]";
+	}
+	
+	
 	
 }
 

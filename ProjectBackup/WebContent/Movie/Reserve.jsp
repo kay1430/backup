@@ -1,3 +1,6 @@
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Date"%>
+<%@page import="sist.co.Reservation.ReservationDTO"%>
 <%@page import="java.sql.Timestamp"%>
 <%@page import="sist.co.Price.PriceDTO"%>
 <%@page import="sist.co.Price.PriceDAO"%>
@@ -39,9 +42,12 @@ td.eachone{
 </style>
 </head>
 <body>
-<%!
+<%!  
 public boolean nvl(String msg){
 	return msg==null || msg.trim().equals("")?true:false; 	
+}
+public String two(String msg){	// 날짜가 한자리 수일때 두자리로 표현하기 위한 함수 (ex. 1월 => 01월 )
+	return msg.trim().length()<2?"0"+msg:msg.trim();
 }
 public String timestamp2string(Timestamp t){ 	// timestamp를 String으로 변환
 	return (""+t+"").substring(11, 16);
@@ -94,7 +100,24 @@ public String getChooseTime(List<TheaterDTO> thelist, int th_seq){	// 고객이 
 			return timestamp2string(thelist.get(i).getTh_time());
 		}
 	}
-	return "";
+	return null;	// return "";
+}
+public Timestamp getTimestamp(String str){	// date => timestamp
+    return Timestamp.valueOf(str);
+}
+public boolean compareTime(String stractdate){ 
+	
+	Date thisdate = new Date();	//오늘 날짜
+	Date actdate; //스트링을 date로 저장할 변수 
+	try { 
+		actdate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(stractdate); 
+	}catch (Exception e) {
+		actdate = null;
+	} 
+	if (actdate.getTime() > thisdate.getTime()) {	
+		return true;
+	}
+	return false;
 }
 %>
 
@@ -181,6 +204,36 @@ List<PriceDTO> plist = pdao.getPriceList();
 // Movie Data 취득
 MovieDAO mdao = MovieDAO.getInstance();
 List<MovieDTO> mlist = mdao.getOnMovieList();
+
+// Theater Data 취득
+TheaterDAO thdao = TheaterDAO.getInstance();
+List<TheaterDTO> thlist = thdao.getTheaterList(seq);
+
+
+// 예매관련 r_time 넣기 위한 작업 => timestamp에 값 못넣겟음. 그래서 그냥 DB에 String식으로 넣는 방식으로 바꿈 (0801 수정할거) => 좌석선택후 이런식으로 넣을꺼임
+/* String s  = year+"-"+two(month+"")+"-"+two(sdate+"")+" "+getChooseTime(thlist, th_seq)+":00";
+System.out.println("s:" + s); */
+
+// 예매관련
+ReservationDTO rdto = new ReservationDTO();
+rdto.setM_id(mem.getM_id());
+rdto.setTh_seq(th_seq);
+rdto.setMv_seq(seq);
+rdto.setR_totalprice(getTotalPrice(plist, adult, student, elder));
+rdto.setR_adult(adult);
+rdto.setR_student(student);
+rdto.setR_elder(elder);
+/*  if(syear != null && smonth != null && sdate != null && getChooseTime(thlist, th_seq)!= null){
+	rdto.setR_viewtime(getTimestamp(s)); //yyyy-mm-dd hh:mm:ss형식
+	System.out.println("rdto.setR_viewtime((Timestamp)t):" + rdto.getR_viewtime()); 
+} */ 
+ /* rdto.setR_viewtime(getTimestamp("2016-08-02 11:00:00")); //yyyy-mm-dd hh:mm:ss형식 */
+ /* s = "2016-08-02 11:00:00"; */
+/*  rdto.setR_viewtime(getTimestamp(s));  *///yyyy-mm-dd hh:mm:ss형식
+
+
+session.setAttribute("rdto", rdto);
+
 %>
 
 <form action="ReserveAf.jsp">
@@ -205,9 +258,8 @@ List<MovieDTO> mlist = mdao.getOnMovieList();
 		</td>
 		<td width="100px">
 			<!-- <select size="10" name="th_name_selec"> -->
-			<%	TheaterDAO thdao = new TheaterDAO();
-				List<TheaterDTO> thlist = new ArrayList<TheaterDTO>();
-				thlist = thdao.getTheaterList(seq);
+			<%	
+				
 				String th_name_duple[] = new String[thlist.size()];	// 해당영화 상영을 명동 1관, 2관 혹은 1관 1회 2회일 경우, 명동이 두번 나오기떄문에, 한번만 나오도록함
 				for(int i = 0; i < th_name_duple.length; i++){		// 초기화. 초기화안시키면 null이라 다음 for문에서 오류남
 					th_name_duple[i] = "";
@@ -270,6 +322,8 @@ List<MovieDTO> mlist = mdao.getOnMovieList();
 					if(mysysdate.get(Calendar.DATE) == i || (mysysdate.get(Calendar.DATE)+1) == i || (mysysdate.get(Calendar.DATE)+2) == i){	// 오늘날짜~+2까지 예매가능 
 						if(mysysdate.get(Calendar.YEAR) == year && (mysysdate.get(Calendar.MONTH)+1) == month){ %>	
 							<td align="center"><a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=i%>"><%=i %></a></td>
+					<%	}else{	%>
+							<td align="center"><%=i %></td>
 					<%	}
 					}else{ %>
 						<td align="center"><%=i %></td>
@@ -322,7 +376,7 @@ List<MovieDTO> mlist = mdao.getOnMovieList();
 							<td>관람일을 선택하세요</td>
 					<%	}else{ %>
 							<td><%=year %>-<%=month %>-<%=sdate %> <%=getChooseTime(thlist, th_seq) %></td>
-					<%	} %>
+					<%	}	%>
 				</tr>
 				<tr>
 					<th>인원</th>
@@ -333,7 +387,7 @@ List<MovieDTO> mlist = mdao.getOnMovieList();
 					<%	if((adult + student + elder) == 0){ %>
 							<td>인원을 선택하세요</td>
 					<%	}else{ %>
-							<td><%=getTotalPrice(plist, adult, student, elder) %></td>
+							<td><%=getTotalPrice(plist, adult, student, elder) %>원</td>	<%--(0801수정할거)가격 comma표시 --%>
 					<%	} %>
 				</tr>
 				<tr>
@@ -388,10 +442,28 @@ List<MovieDTO> mlist = mdao.getOnMovieList();
 										<td class="headleft"><%=thlist.get(i).getTh_cinema() %></td><td class="eachone">(총 <%=thlist.get(i).getTh_totalseat() %>석)</td></tr><tr>
 									<% 	for(int j = 0; j < th_numlist.size(); j++){%>
 											<%-- <td><%=timestamp2string(th_numlist.get(j).getTh_time()) %></td> --%>
-											<td align="center">
+											<%-- <td align="center">
 												<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_numlist.get(j).getTh_seq()%>"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></a>
-											</td>
-									<%	}%>
+											</td> --%>
+											
+											<%	// 현재날짜 및 시간보다 이전일 경우, 선택못하게 anchor를 뺀다
+											String tt = getChooseTime(thlist, th_numlist.get(j).getTh_seq());
+											System.out.println("tt:"+tt);
+											/* if(syear != null && smonth != null && sdate != null && tt != null){ */
+											if(sdate != null){
+											
+												String s  = year+"-"+two(month+"")+"-"+two(sdate+"")+" "+tt;
+												if(compareTime(s)){ 
+													System.out.println("(t)s:" + s );
+													%>
+													<td align="center">
+														<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_numlist.get(j).getTh_seq()%>"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></a>
+													</td>
+											<%	}else{ System.out.println("(f)s:" + s ); %>
+													<td align="center"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></td>
+											<%	}
+											}
+										}%>
 										</tr><tr>
 									<%	th_cinema_duple[k] = thlist.get(i).getTh_cinema();
 										k++;

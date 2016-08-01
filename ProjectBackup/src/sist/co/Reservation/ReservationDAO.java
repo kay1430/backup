@@ -1,4 +1,4 @@
-package test.Reservation;
+package sist.co.Reservation;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sist.co.DBManager.DBManager;
-import test.Movie.MovieDTO;
+import sist.co.Reservation.ReservationDTO;
 
 public class ReservationDAO implements iReservateionDAO {
   
@@ -250,6 +250,8 @@ public class ReservationDAO implements iReservateionDAO {
 		System.out.println(count);
 		return count>0?true:false;
 	}
+	
+	
 
 	public void log(String msg){
 		if(isS){ //isS가 true일때
@@ -262,5 +264,132 @@ public class ReservationDAO implements iReservateionDAO {
 			System.out.println(e + ":" + this.getClass() + ":" + msg);
 		}
 	}
+	
+	
+	//ay
+	@Override
+	public boolean judgereserve(int seq, String id) {
+		
+		String sql = " SELECT * FROM RESERVATION WHERE MV_SEQ=? AND M_ID=? ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+		ResultSet rs = null;
+				
+		boolean isS = false;
+		
+		try{
+			conn = DBManager.getConnection();
+			log("2/6 Success judgereserve");
+			
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, seq);
+			psmt.setString(2, id);
+			log("3/6 Success judgereserve");
+			
+			rs = psmt.executeQuery();
+			log("4/6 Success judgereserve");
+			while(rs.next()){
+				isS = true;		// 해당하는 데이터가 있으면 true
+			}
+			System.out.println("isS:" + isS);
+			
+		}catch(SQLException e){
+			log("Fail judgereserve");
+		}finally{
+			DBManager.close(conn, psmt, rs);
+			log("6/6 Success judgereserve");
+		}
+
+		return isS;
+	}
+
+	@Override
+	public int judgepoll(int seq, String id) {
+	
+		String sql = " SELECT R_POLL FROM RESERVATION WHERE MV_SEQ=? AND M_ID=? ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+		ResultSet rs = null;
+				
+		int r_poll = 0;
+		
+		try{
+			conn = DBManager.getConnection();
+			log("2/6 Success judgereserve");
+			
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, seq);
+			psmt.setString(2, id);
+			log("3/6 Success judgereserve");
+			
+			rs = psmt.executeQuery();
+			log("4/6 Success judgereserve");
+			while(rs.next()){
+				r_poll = rs.getInt(1);
+			}
+			System.out.println("r_poll:" + r_poll);
+			
+		}catch(SQLException e){
+			log("Fail judgereserve");
+		}finally{
+			DBManager.close(conn, psmt, rs);
+			log("6/6 Success judgereserve");
+		}
+				
+		return r_poll;	// 0: 투표 X, 1: 좋아요, 2: 싫어요 => true : 투표했음
+
+	}
+
+	@Override
+	public boolean reserve(ReservationDTO rdto) {
+
+		String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+				
+		int count = 0;
+		
+		try{
+			conn = DBManager.getConnection();
+			log("2/6 Success reserve");
+			
+			psmt = conn.prepareStatement(sql);
+			int i = 1;
+			psmt.setString(i++, rdto.getM_id());
+			psmt.setInt(i++, rdto.getTh_seq());
+			psmt.setInt(i++, rdto.getMv_seq());
+			psmt.setInt(i++, rdto.getR_totalprice());
+			psmt.setInt(i++, rdto.getR_adult());
+			psmt.setInt(i++, rdto.getR_student());
+			psmt.setInt(i++, rdto.getR_elder());
+			psmt.setString(i++, rdto.getR_seat());
+			psmt.setTimestamp(i++, rdto.getR_time());	// (0801수정할거) DATE형에 timestamp형 넣어도 잘 들어가는지 확인해보기
+			psmt.setTimestamp(i++, rdto.getR_viewtime());
+			psmt.setString(i++, rdto.getR_thname());
+			psmt.setString(i++, rdto.getR_cinema());
+			log("3/6 Success reserve");
+			
+			count = psmt.executeUpdate();
+			log("4/6 Success reserve");
+			
+			
+		}catch(SQLException e){
+			log("Fail reserve");
+		}finally{
+			DBManager.close(conn, psmt);
+			log("6/6 Success reserve");
+		}
+		
+		return count>0?true:false;
+	}
+	
+	
+	
+	
+	
+	
 
 }

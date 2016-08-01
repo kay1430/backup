@@ -5,8 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public interface iMember {
-	boolean AddMember(MemberDTO dto);
+	int AddMember(MemberDTO dto);
 	boolean IdDuple(String id);
 	boolean EmailDuple(String email);
-	MemberDTO login(MemberDTO dto);
+	int login(String m_id, String m_pw);
+	MemberDTO selectMemberDTO(String m_id);
 }

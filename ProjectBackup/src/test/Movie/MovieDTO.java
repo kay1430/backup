@@ -10,10 +10,10 @@ public class MovieDTO {
 	private String mv_genre;
 	private String mv_story;
 	private String mv_img;
-	private int mv_count;
-	private int mv_like;
-	private int mv_hate;
-	private int mv_on;
+	private int mv_count;	// 해당 영화의 총 예매
+	private float mv_like;	// like/총 예매
+	private float mv_hate;	// hate/총 예매
+	private int mv_on;		// 상영여부(1:상영, 0:X)
 	
 	public MovieDTO() {
 		
@@ -75,19 +75,19 @@ public class MovieDTO {
 		this.mv_count = mv_count;
 	}
 
-	public int getMv_like() {
+	public float getMv_like() {
 		return mv_like;
 	}
 
-	public void setMv_like(int mv_like) {
+	public void setMv_like(float mv_like) {
 		this.mv_like = mv_like;
 	}
 
-	public int getMv_hate() {
+	public float getMv_hate() {
 		return mv_hate;
 	}
 
-	public void setMv_hate(int mv_hate) {
+	public void setMv_hate(float mv_hate) {
 		this.mv_hate = mv_hate;
 	}
 
@@ -105,4 +105,6 @@ public class MovieDTO {
 				+ mv_genre + ", mv_story=" + mv_story + ", mv_img=" + mv_img + ", mv_count=" + mv_count + ", mv_like="
 				+ mv_like + ", mv_hate=" + mv_hate + ", mv_on=" + mv_on + "]";
 	}
+
+	
 }

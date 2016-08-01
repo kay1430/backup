@@ -13,7 +13,7 @@ public class ReviewDAO {
 
 	
 	private static ReviewDAO reviewDao;
-	
+	  
 	
 	public static ReviewDAO getInstance(){
 		if (reviewDao == null) {
@@ -46,11 +46,14 @@ public class ReviewDAO {
 				int i = 1;
 				redto.setR_seq(rs.getInt(i++));
 				redto.setM_id(rs.getString(i++));
+				redto.setMv_seq(rs.getInt(i++));
 				redto.setR_title(rs.getString(i++));
 				redto.setR_content(rs.getString(i++));
 				redto.setR_writedate(rs.getTimestamp(i++));
 				redto.setR_like(rs.getInt(i++));
 				redto.setR_readcount(rs.getInt(i++));
+				redto.setR_star(rs.getInt(i++));
+				
 				
 				list.add(redto);
 			}
@@ -68,7 +71,7 @@ public class ReviewDAO {
 	public int addReview(ReviewDTO redto){
 		int result = -1;
 		
-		String sql ="insert into review values (review_seq.nextval,?,?,?,sysdate,0,0)";
+		String sql ="insert into review values (review_seq.nextval,?,0,?,?,sysdate,0,0,?)";
 		
 		Connection conn=null;
 		PreparedStatement pstmt = null;
@@ -81,7 +84,7 @@ public class ReviewDAO {
 			pstmt.setString(1, redto.getM_id());
 			pstmt.setString(2, redto.getR_title());
 			pstmt.setString(3, redto.getR_content());
-			
+			pstmt.setInt(4, redto.getR_star());
 			result = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -118,12 +121,13 @@ public class ReviewDAO {
 				
 				redto.setR_seq(rs.getInt(i++));
 				redto.setM_id(rs.getString(i++));
+				redto.setMv_seq(rs.getInt(i++));
 				redto.setR_title(rs.getString(i++));
 				redto.setR_content(rs.getString(i++));
 				redto.setR_writedate(rs.getTimestamp(i++));
 				redto.setR_like(rs.getInt(i++));
 				redto.setR_readcount(rs.getInt(i++));
-				
+				redto.setR_star(rs.getInt(i++));
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -220,7 +224,58 @@ public class ReviewDAO {
 		return rlist;
 	}
 	
-	
+	// ReviewList에서 검색기능
+	public List<ReviewDTO> selectContent(String check, String selecting){
+		List<ReviewDTO> selList = new ArrayList<ReviewDTO>();
+		
+		String sql = " ";
+		
+		if(check.equals("1")){
+			//제목으로 검색
+			sql = "select * from review where regexp_like(r_title,?)";
+		}else if(check.equals("2")){
+			//본문으로 검색
+			sql = "select * from review where regexp_like(r_content,?)";
+		}
+		
+		
+		Connection conn = null;
+		PreparedStatement pstmt= null;
+		ResultSet rs = null;
+		
+		try {
+			conn=DBManager.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			
+			pstmt.setString(1, selecting);
+			rs=pstmt.executeQuery();
+			
+			while(rs.next()){
+				ReviewDTO redto = new ReviewDTO();
+				int i = 1;
+				redto.setR_seq(rs.getInt(i++));
+				redto.setM_id(rs.getString(i++));
+				redto.setMv_seq(rs.getInt(i++));
+				redto.setR_title(rs.getString(i++));
+				redto.setR_content(rs.getString(i++));
+				redto.setR_writedate(rs.getTimestamp(i++));
+				redto.setR_like(rs.getInt(i++));
+				redto.setR_readcount(rs.getInt(i++));
+				redto.setR_star(rs.getInt(i++));
+				
+				/*System.out.println("r_seq = "+redto.getR_seq());*/
+				selList.add(redto);
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("DAO");
+			System.out.println(e.getMessage());
+		}finally{
+			DBManager.close(conn, pstmt, rs);
+		}
+		
+		return selList;
+	}
 	
 	
 	
