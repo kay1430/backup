@@ -43,7 +43,7 @@ public class SeatDAO implements ISeat{
 	@Override
 	public List<SeatDTO> getSeatList(int th_seq) {
 	
-		String sql = " SELECT * FROM SEAT WHERE TH_SEQ=? ";
+		String sql = " SELECT * FROM SEAT WHERE TH_SEQ=? ORDER BY S_SEQ ";
 		
 		Connection conn=null;
 		PreparedStatement pstmt = null;
@@ -74,6 +74,37 @@ public class SeatDAO implements ISeat{
 		}
 		
 		return slist;
+	}
+
+	@Override
+	public boolean adminSeatSetting(int th_seq, String s_name) {
+		
+		String sql = " INSERT INTO SEAT VALUES(S_SEQ.NEXTVAL, ?, ?, 0) ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+				
+		int count = 0;
+		
+		try{
+			conn = DBManager.getConnection();
+			
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, th_seq);
+			psmt.setString(2, s_name);
+			
+			count = psmt.executeUpdate();
+			
+			
+		}catch(SQLException e){
+			log("Fail adminSeatSetting");
+		}finally{
+			DBManager.close(conn, psmt);
+			//log("6/6 Success adminSeatSetting");
+		}
+		
+		return count>0?true:false;
+
 	}
 	
 	
