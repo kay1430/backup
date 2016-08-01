@@ -139,8 +139,8 @@ public class ReservationDTO {
 	public String toString() {
 		return "ReservationDTO [r_seq=" + r_seq + ", m_id=" + m_id + ", th_seq=" + th_seq + ", mv_seq=" + mv_seq
 				+ ", r_poll=" + r_poll + ", r_totalprice=" + r_totalprice + ", r_adult=" + r_adult + ", r_student="
-				+ r_student + ", r_elder=" + r_elder + ", r_time=" + r_time + ", r_thname=" + r_thname + ", r_cinema="
-				+ r_cinema + "]";
+				+ r_student + ", r_elder=" + r_elder + ",r_seat=" + r_seat + ", r_time=" + r_time + ",r_viewtime=" + r_viewtime 
+				+ ", r_thname=" + r_thname + ", r_cinema=" + r_cinema + "]";
 	}
 
 }

@@ -105,6 +105,20 @@ public String getChooseTime(List<TheaterDTO> thelist, int th_seq){	// 고객이 
 public Timestamp getTimestamp(String str){	// date => timestamp
     return Timestamp.valueOf(str);
 }
+public boolean compareTime(String stractdate){ 
+	
+	Date thisdate = new Date();	//오늘 날짜
+	Date actdate; //스트링을 date로 저장할 변수 
+	try { 
+		actdate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(stractdate); 
+	}catch (Exception e) {
+		actdate = null;
+	} 
+	if (actdate.getTime() > thisdate.getTime()) {	
+		return true;
+	}
+	return false;
+}
 %>
 
 <%
@@ -216,7 +230,6 @@ rdto.setR_elder(elder);
  /* rdto.setR_viewtime(getTimestamp("2016-08-02 11:00:00")); //yyyy-mm-dd hh:mm:ss형식 */
  /* s = "2016-08-02 11:00:00"; */
 /*  rdto.setR_viewtime(getTimestamp(s));  *///yyyy-mm-dd hh:mm:ss형식
- 
 
 
 session.setAttribute("rdto", rdto);
@@ -429,10 +442,28 @@ session.setAttribute("rdto", rdto);
 										<td class="headleft"><%=thlist.get(i).getTh_cinema() %></td><td class="eachone">(총 <%=thlist.get(i).getTh_totalseat() %>석)</td></tr><tr>
 									<% 	for(int j = 0; j < th_numlist.size(); j++){%>
 											<%-- <td><%=timestamp2string(th_numlist.get(j).getTh_time()) %></td> --%>
-											<td align="center">
+											<%-- <td align="center">
 												<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_numlist.get(j).getTh_seq()%>"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></a>
-											</td>
-									<%	}%>
+											</td> --%>
+											
+											<%	// 현재날짜 및 시간보다 이전일 경우, 선택못하게 anchor를 뺀다
+											String tt = getChooseTime(thlist, th_numlist.get(j).getTh_seq());
+											System.out.println("tt:"+tt);
+											/* if(syear != null && smonth != null && sdate != null && tt != null){ */
+											if(sdate != null){
+											
+												String s  = year+"-"+two(month+"")+"-"+two(sdate+"")+" "+tt;
+												if(compareTime(s)){ 
+													System.out.println("(t)s:" + s );
+													%>
+													<td align="center">
+														<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_numlist.get(j).getTh_seq()%>"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></a>
+													</td>
+											<%	}else{ System.out.println("(f)s:" + s ); %>
+													<td align="center"><%=timestamp2string(th_numlist.get(j).getTh_time()) %></td>
+											<%	}
+											}
+										}%>
 										</tr><tr>
 									<%	th_cinema_duple[k] = thlist.get(i).getTh_cinema();
 										k++;

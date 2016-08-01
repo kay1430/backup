@@ -36,10 +36,12 @@ if(rdto.getM_id()==null){ %>
 	</script>
 <%	
 }else{
-	System.out.println(rdto.toString());
-	
-}
-%>
+	System.out.println(rdto.toString()); %>
+	<script type="text/javascript">
+		location.href = "Seat.jsp";
+	</script>
+<%
+} %>
 
 
 ReserveAf
