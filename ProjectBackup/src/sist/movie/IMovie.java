@@ -8,4 +8,8 @@ public interface IMovie {
 	boolean addlike(int seq, int likeorhate, String id);
 	List<MovieDTO> getOnMovieList();
 	
+	// SNS/ReviewWrite에서 사용됨
+	List<MovieDTO> getMovie(); 
+	
+	
 }

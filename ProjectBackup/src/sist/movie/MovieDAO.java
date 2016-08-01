@@ -16,7 +16,7 @@ public class MovieDAO implements IMovie{
 	
 	public MovieDAO() {
 	
-	}
+	} 
 
 	public void log(String msg){
 		if(isS){
@@ -187,7 +187,47 @@ public class MovieDAO implements IMovie{
 		return mlist;
 	}
 
+	
+	
+	// SNS/ReviewWrite에서 영화 이미지 가져올때 사용됨
+	// mv_seq, mv_title, mv_img 값만 가지는 MovieDTO를 List에 담아 리턴
+	@Override
+	public List<MovieDTO> getMovie() {
+		MovieDTO movie = null;
+		List<MovieDTO> molist = new ArrayList<MovieDTO>();
+		
+		String sql = "select mv_seq,mv_title,mv_img from movie";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()){
+				movie = new MovieDTO();
+				
+				movie.setMv_seq(rs.getInt("mv_seq"));
+				movie.setMv_title(rs.getString("mv_title"));
+				movie.setMv_img(rs.getString("mv_img"));
+				
+				molist.add(movie);
+			}
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}finally{
+			DBManager.close(conn, pstmt, rs);
+		}
+		return molist;
+	}
 
+	
+	
 
 
 	

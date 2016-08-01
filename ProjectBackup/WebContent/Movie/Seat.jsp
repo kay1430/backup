@@ -95,7 +95,7 @@ String[] rowname = getRow(slist);
 					for(int j = 0; j < slist.size(); j++){
 						if(rowname[i].equals(slist.get(j).getS_name().substring(0, 1))){
 							if(slist.get(i).getS_check()==0){	// 빈자리 : anchor%>			
-								<td><a href="Seat.jsp"><%=Integer.parseInt(slist.get(j).getS_name().substring(1,2))+1 %></a></td>
+								<td><a href="Seat.jsp"><%=Integer.parseInt(slist.get(j).getS_name().substring(1,slist.get(j).getS_name().length()))+1 %></a></td>
 				<%			}else{ %> 									
 								<td><%=slist.get(j).getS_name().substring(1,2) %></td> 
 				<%			}
