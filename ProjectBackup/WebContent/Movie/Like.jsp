@@ -1,6 +1,6 @@
-<%@page import="sist.movie.ReservationDAO"%>
-<%@page import="sist.movie.MovieDAO"%>
-<%@page import="sist.movie.MovieDTO"%>
+<%@page import="sist.co.Reservation.ReservationDAO"%>
+<%@page import="sist.co.movie.MovieDAO"%>
+<%@page import="sist.co.movie.MovieDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@page import="sist.co.Member.MemberDTO"%>

@@ -7,10 +7,10 @@
 <%@page import="java.util.Calendar"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
-<%@page import="sist.movie.TheaterDTO"%>
-<%@page import="sist.movie.TheaterDAO"%>
-<%@page import="sist.movie.MovieDAO"%>
-<%@page import="sist.movie.MovieDTO"%>
+<%@page import="sist.co.Theater.TheaterDTO"%>
+<%@page import="sist.co.Theater.TheaterDAO"%>
+<%@page import="sist.co.movie.MovieDAO"%>
+<%@page import="sist.co.movie.MovieDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@page import="sist.co.Member.MemberDTO"%>

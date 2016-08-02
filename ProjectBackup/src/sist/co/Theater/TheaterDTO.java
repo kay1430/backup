@@ -1,10 +1,10 @@
-package test.Theater;
+package sist.co.Theater;
 
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class TheaterDTO {
-	 
+
 	private int th_seq;
 	private String th_name;
 	private int mv_seq;
@@ -12,9 +12,10 @@ public class TheaterDTO {
 	private int th_num;
 	private int th_totalseat;
 	private int th_leftseat;
-	private Timestamp th_time; /////////////timestamp
+	private Timestamp th_time;
 	
-	public TheaterDTO() { 
+	public TheaterDTO() {
+		
 	}
 
 	public int getTh_seq() {
@@ -88,4 +89,7 @@ public class TheaterDTO {
 				+ ", th_time=" + th_time + "]";
 	}
 
+	
+
+	
 }

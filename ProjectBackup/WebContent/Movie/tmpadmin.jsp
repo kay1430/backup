@@ -1,5 +1,5 @@
-<%@page import="sist.movie.TheaterDTO"%>
-<%@page import="sist.movie.TheaterDAO"%>
+<%@page import="sist.co.Theater.TheaterDTO"%>
+<%@page import="sist.co.Theater.TheaterDAO"%>
 <%@page import="sist.co.Reservation.ReservationDTO"%>
 <%@page import="sist.co.Seat.SeatDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"

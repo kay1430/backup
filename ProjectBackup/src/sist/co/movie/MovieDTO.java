@@ -1,4 +1,4 @@
-package test.Movie;
+package sist.co.movie;
 
 import java.util.Date;
 
@@ -15,10 +15,11 @@ public class MovieDTO {
 	private float mv_hate;	// hate/총 예매
 	private int mv_on;		// 상영여부(1:상영, 0:X)
 	
+
 	public MovieDTO() {
 		
 	}
-
+	
 	public int getMv_seq() {
 		return mv_seq;
 	}
@@ -51,14 +52,6 @@ public class MovieDTO {
 		this.mv_genre = mv_genre;
 	}
 
-	public String getMv_story() {
-		return mv_story;
-	}
-
-	public void setMv_story(String mv_story) {
-		this.mv_story = mv_story;
-	}
-
 	public String getMv_img() {
 		return mv_img;
 	}
@@ -66,21 +59,29 @@ public class MovieDTO {
 	public void setMv_img(String mv_img) {
 		this.mv_img = mv_img;
 	}
-
-	public int getMv_count() {
-		return mv_count;
-	}
-
-	public void setMv_count(int mv_count) {
-		this.mv_count = mv_count;
-	}
-
+	
 	public float getMv_like() {
 		return mv_like;
 	}
 
 	public void setMv_like(float mv_like) {
 		this.mv_like = mv_like;
+	}
+
+	public int getMv_on() {
+		return mv_on;
+	}
+
+	public void setMv_on(int mv_on) {
+		this.mv_on = mv_on;
+	}
+	
+	public int getMv_count() {
+		return mv_count;
+	}
+
+	public void setMv_count(int mv_count) {
+		this.mv_count = mv_count;
 	}
 
 	public float getMv_hate() {
@@ -91,20 +92,20 @@ public class MovieDTO {
 		this.mv_hate = mv_hate;
 	}
 
-	public int getMv_on() {
-		return mv_on;
+	public String getMv_story() {
+		return mv_story;
 	}
 
-	public void setMv_on(int mv_on) {
-		this.mv_on = mv_on;
+	public void setMv_story(String mv_story) {
+		this.mv_story = mv_story;
 	}
 
-	@Override
-	public String toString() {
-		return "MovieDTO [mv_seq=" + mv_seq + ", mv_title=" + mv_title + ", mv_openday=" + mv_openday + ", mv_genre="
-				+ mv_genre + ", mv_story=" + mv_story + ", mv_img=" + mv_img + ", mv_count=" + mv_count + ", mv_like="
-				+ mv_like + ", mv_hate=" + mv_hate + ", mv_on=" + mv_on + "]";
+	public String toString(){
+		return "MOVIE[mv_seq:" + mv_seq + ",mv_title:" + mv_title + ",mv_openday:" + mv_openday
+				+ ",mv_genre:" + mv_genre + ",mv_story:" + mv_story	+ ",mv_img:" + mv_img 
+				+ "mv_count:" + mv_count + ",mv_like:" + mv_like + ",mv_hate:" + mv_hate  
+				+ ",mv_on:" + mv_on + "]"; 
 	}
-
+	
 	
 }
