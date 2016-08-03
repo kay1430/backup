@@ -9,12 +9,13 @@
 <script type="text/javascript">
 function callme(value){
 	var selectValue = document.getElementById('sel').value;
-	document.myvalue.data.value=selectValue;
+	var textValue = document.getElementById('th_name').value;
+	document.myvalue.data1.value=selectValue;
+	document.myvalue.data2.value=textValue;
 	/* document.myvalue.method="GET";
 	document.myvalue.action="AddTheater.jsp";
-	document.submit(); */
-	var textValue = document.getElementById('th_name').value;
-	location.href="AddTheater.jsp?data="+selectValue+"&th_name="+textValue;
+	document.submit();
+	 */
 	
 }
 </script>
@@ -59,6 +60,11 @@ System.out.println("data:" + data);
 				관
 			</td>
 		</tr>
+<!-- </table>
+ </form>
+
+<form action="AddTheaterAf.jsp">
+<table> -->
 		<tr>
 			<th>회차</th>
 			<td>
@@ -67,9 +73,9 @@ System.out.println("data:" + data);
 						<tr>
 							<th><%=i+1 %>관</th> <%-- x관 --%>
 							<td>
-								<select style="width: 100px">
+								<select id="<%=i+1 %>" style="width: 100px">
 									<%for(int j = 1; j < 11; i++){ %>
-										<option value="<%=j %>"><%=i %></option>
+										<option value="<%=j %>"><%=j %></option>
 									<%} %>
 								</select>
 								차
@@ -81,11 +87,11 @@ System.out.println("data:" + data);
 		</tr>
 		<tr>
 			<td colspan="2">
-				<input type="hidden" name="data">
+				<input type="text" name="data1">
+				<input type="text" name="data2">
 				<input type="submit" value="추가">
 			</td>
 		</tr>
-	
 	</table>
 </form>
 
