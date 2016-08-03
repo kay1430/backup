@@ -40,6 +40,9 @@ td.eachone{
 	vertical-align: center;
 	border-left: 0px;
 }
+#summary{
+	text-align: center;
+}
 </style>
 </head>
 <body>
@@ -53,7 +56,7 @@ public String two(String msg){	// 날짜가 한자리 수일때 두자리로 표
 public String timestamp2string(Timestamp t){ 	// timestamp를 String으로 변환
 	return (""+t+"").substring(11, 16);
 }
-public List<TheaterDTO> getTheaterMatch(List<TheaterDTO> thelist, int seq, String th_name, String th_cinema){ // 시간표 출력시 해당 영화의 상영관 출력에 이용
+/* public List<TheaterDTO> getTheaterMatch(List<TheaterDTO> thelist, int seq, String th_name, String th_cinema){ // 시간표 출력시 해당 영화의 상영관 출력에 이용 : TheaterDAO dao.getTh_num()대신사용
 	List<TheaterDTO> result = new ArrayList<TheaterDTO>();
 	for(int i = 0; i < thelist.size(); i++){
 		if(thelist.get(i).getMv_seq() == seq && th_name.equals(thelist.get(i).getTh_name()) && th_cinema.equals(thelist.get(i).getTh_cinema())){
@@ -61,15 +64,19 @@ public List<TheaterDTO> getTheaterMatch(List<TheaterDTO> thelist, int seq, Strin
 		}
 	}
 	return result;
-}
-/* public int getleftseat(List<TheaterDTO> thelist, int th_seq){	// 잔여석
+} */
+public List<TheaterDTO> getTheaterMatch(List<TheaterDTO> thelist, int seq, String th_name, String th_cinema, String chooseCal){ // 시간표 출력시 해당 영화의 상영관 출력에 이용. 단, 선택한 날짜에 해당영화를 상영하는 상영관의 시간표만 출력해야하므로, 인자값에 선택한 날짜(year, month)필요 : TheaterDAO dao.getTh_num()대신사용
+	Date actdate = String2Date(chooseCal);
+	List<TheaterDTO> result = new ArrayList<TheaterDTO>();
 	for(int i = 0; i < thelist.size(); i++){
-		if(th_seq == thelist.get(i).getTh_seq()){
-			return thelist.get(i).getTh_leftseat();
+		if(thelist.get(i).getMv_seq() == seq && th_name.equals(thelist.get(i).getTh_name()) && th_cinema.equals(thelist.get(i).getTh_cinema())){
+			if(actdate.getTime() >= thelist.get(i).getTh_s_date().getTime() && actdate.getTime() <= thelist.get(i).getTh_e_date().getTime()){
+				result.add(thelist.get(i));
+			}
 		}
 	}
-	return -1;
-} */
+	return result;
+} 
 public int getPrice(List<PriceDTO> plist, String man){		// 가격표 
 	for(int i = 0; i < plist.size(); i++){
 		if(plist.get(i).getP_grade().equals(man)) 
@@ -103,15 +110,15 @@ public String getChooseTime(List<TheaterDTO> thelist, int th_seq){	// 고객이 
 	}
 	return null;	// return "";
 }
-public Timestamp getTimestamp(String str){	// date => timestamp
+public Timestamp getTimestamp(String str){	// string => timestamp
     return Timestamp.valueOf(str);
 }
-public boolean compareTime(String stractdate){ 
+public boolean compareTime(String stractdate){ // 시간표 부를때, 현재시간보다 이전의 시간은 선택할수 없도록 anchor빼는데 사용
 	
 	Date thisdate = new Date();	//오늘 날짜
 	Date actdate; //스트링을 date로 저장할 변수 
 	try { 
-		actdate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(stractdate); 
+		actdate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(stractdate); // 분 mm써도되나? mi아닌가?..(0804수정할거)
 	}catch (Exception e) {
 		actdate = null;
 	} 
@@ -119,6 +126,15 @@ public boolean compareTime(String stractdate){
 		return true;
 	}
 	return false;
+}
+public Date String2Date(String stractdate){
+	Date actdate; //스트링을 date로 저장할 변수 
+	try { 
+		actdate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(stractdate); // 분 mm써도되나? mi아닌가?..(0804수정할거)
+	}catch (Exception e) {
+		actdate = null;
+	} 
+	return actdate;
 }
 %>
 
@@ -361,7 +377,7 @@ session.setAttribute("rdto", rdto);
 					
 		</td>
 		<td rowspan="3" width="225px" align="center">
-			<table width="100%" height="100%">
+			<table width="100%" height="100%" id="summary">
 				<tr> <!-- <td colspan="2"><img src="../img/arrow.png" alt="포스터"></td> -->
 					<%	if(seq == 0){ %>
 							<td colspan="2"><img src="../img/emptyposter.jpg"></td>
@@ -379,7 +395,7 @@ session.setAttribute("rdto", rdto);
 				</tr>
 				<tr>
 					<th>상영관</th>
-					<%	if(th_name == null){ %>
+					<%	if(th_name == null || "".equals(th_name)){ %>
 							<td>상영관을 선택하세요</td>
 					<%	}else{ %>
 							<td><%=th_name %>
@@ -416,8 +432,7 @@ session.setAttribute("rdto", rdto);
 					<% if(th_seq == 0){ %>
 							관람시간을 선택하세요
 					<%	}else{ %>
-							<%-- <%=getleftseat(thlist, th_seq) %>석 --%>
-							<%=leftseat %>석
+							<%=leftseat %>석/<%=thdto.getTh_totalseat() %>석
 					<%	}	%>
 					</td>
 				</tr>
@@ -450,7 +465,8 @@ session.setAttribute("rdto", rdto);
 									List<TheaterDTO> th_numlist = new ArrayList<TheaterDTO>();  
 									// (1) sql  th_numlist = thdao.getTh_num(seq, th_name, thlist.get(i).getTh_cinema()); 
 									// (2) 메소드
-									th_numlist = getTheaterMatch(thlist, seq, th_name, thlist.get(i).getTh_cinema());
+									String tt2  = year+"-"+two(month+"")+"-"+two(sdate+"")+" 00:00";
+									th_numlist = getTheaterMatch(thlist, seq, th_name, thlist.get(i).getTh_cinema(), tt2);	// 해당날짜 00시00분으로 해야 해당날짜의 모든 시간대의 시간표들이 출력됨! 
 									
 									for(int j = 0; j < i; j++){	
 										if(th_cinema_duple[j].equals(thlist.get(i).getTh_cinema()))		// th_name_duple배열에 이미 해당 영화관존재
@@ -501,10 +517,10 @@ session.setAttribute("rdto", rdto);
 			<table width="100%">
 				<tr>
 					<th colspan="5" class="headleft">성인</th>
-					<td class="eachone" colspan="3">1매/<%=getPrice(plist, "adult")%>원</td>
+					<td class="eachone" colspan="4">1매/<%=getPrice(plist, "adult")%>원</td>
 				</tr>
 				<tr>
-				<%	for(int i = 1; i < 9; i++){ %>
+				<%	for(int i = 0; i < 9; i++){ %>
 						<td align="center">
 						<%	//if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다
 							if(i > leftseat){ %>
@@ -517,10 +533,10 @@ session.setAttribute("rdto", rdto);
 				</tr>
 				<tr>
 					<th colspan="5" class="headleft">학생</th>
-					<td class="eachone" colspan="3">1매/<%=getPrice(plist, "student")%>원</td>
+					<td class="eachone" colspan="4">1매/<%=getPrice(plist, "student")%>원</td>
 				</tr>
 				<tr>
-				<%	for(int i = 1; i < 9; i++){ %>
+				<%	for(int i = 0; i < 9; i++){ %>
 						<td align="center">
 						<%	//if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다
 							if(i > leftseat){ %>
@@ -533,10 +549,10 @@ session.setAttribute("rdto", rdto);
 				</tr>
 				<tr>
 					<th colspan="5" class="headleft">우대(65세이상)</th>
-					<td class="eachone" colspan="3">1매/<%=getPrice(plist, "elder")%>원</td>
+					<td class="eachone" colspan="4">1매/<%=getPrice(plist, "elder")%>원</td>
 				</tr>
 				<tr>
-				<%	for(int i = 1; i < 9; i++){ %>
+				<%	for(int i = 0; i < 9; i++){ %>
 						<td align="center">
 						<%	//if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다
 							if(i > leftseat){ %>

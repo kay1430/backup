@@ -1,3 +1,4 @@
+<%@page import="java.sql.Timestamp"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="sist.co.Seat.SeatDTO"%>
 <%@page import="sist.co.Seat.SeatDAO"%>
@@ -39,10 +40,23 @@ th,td{
 	border: 1px solid black;
 	text-align: center;
 }
+th.myhead{
+	height: 20px;
+	background-color: #dcdcdc;
+}
+.mydata{
+	height: 50px;
+	font-size: 20px;
+}
 </style>
 </head>
 <body>
-
+<%!
+public String timestamp2string(Timestamp tmsp){
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	return sdf.format(tmsp);
+}
+%>
 <%
 ReservationDTO rdto = (ReservationDTO)session.getAttribute("rdto");
 System.out.println("rdto.getTh_seq():"+rdto.getTh_seq()+",rdto.getR_seat()"+rdto.getR_seat());
@@ -61,7 +75,7 @@ int leftseat = sdao.cal_leftSeat(rdto.getTh_seq(), sdf.format(rdto.getR_viewtime
 <div>div</div>
 <table>
 	<tr>
-		<th width="500px">총 결제 금액</th>
+		<th width="500px" class="myhead">총 결제 금액</th>
 		<td rowspan="5">
 			<table width="100%" height="100%">
 				<tr> <!-- <td colspan="2"><img src="../img/arrow.png" alt="포스터"></td> -->
@@ -73,12 +87,12 @@ int leftseat = sdao.cal_leftSeat(rdto.getTh_seq(), sdf.format(rdto.getR_viewtime
 				</tr>
 				<tr>
 					<th>상영관</th>
-					<td><%=thdto.getTh_name() %></td>	
+					<td><%=thdto.getTh_name() %> <%=rdto.getR_cinema() %></td>	
 				</tr>
 				<tr>
 					<th>날짜</th>
 					<%-- <td><%=year %>-<%=month %>-<%=sdate %> <%=getChooseTime(thlist, th_seq) %></td> --%>
-					<td>선택한날짜</td>
+					<td><%=timestamp2string(rdto.getR_viewtime()) %></td>
 				</tr>
 				<tr>
 					<th>인원</th>
@@ -110,13 +124,13 @@ int leftseat = sdao.cal_leftSeat(rdto.getTh_seq(), sdf.format(rdto.getR_viewtime
 		</td>
 	</tr>
 	<tr>
-		<td><b><%=rdto.getR_totalprice() %>원</b></td>
+		<td class="mydata"><b><%=rdto.getR_totalprice() %>원</b></td>
 	</tr>
 	<tr>
-		<th>결제 수단 선택</th>
+		<th class="myhead">결제 수단 선택</th>
 	</tr>
 	<tr>
-		<td>
+		<td class="mydata">
 			<select id="selectone" size="3" style="width: 250px" onchange="paychoose()">
 				<option>휴대폰결제</option>
 				<option>무통장입금</option>

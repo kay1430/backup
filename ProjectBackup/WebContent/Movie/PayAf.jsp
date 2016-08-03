@@ -21,6 +21,8 @@ System.out.println("rdto.getTh_seq():"+rdto.getTh_seq()+",rdto.getR_seat()"+rdto
 String mypay = request.getParameter("mypay");
 System.out.println("mypay:" + mypay);
 
+String url = String.format("./%s?mypay=%s", "Done.jsp", mypay);
+
 // 예매되기 직전에 해당날짜, 자리확인 다시한번 해야함. // rdto.getR_viewtime() : yyyy-mm-dd hh:mi:ss => 여기서 날짜만 필요함
 SeatDAO sdao = SeatDAO.getInstance();
 
@@ -32,21 +34,11 @@ for(int i = 0; i < s_name.length; i++){
 	seatcheck += sdto.getS_check();	// 비어있는 좌석일 경우 0, 예약된 좌석일 경우 1 
 	System.out.println("seatcheck:" + seatcheck + ",sdto.getS_check():" + sdto.getS_check());
 }	
-if(seatcheck==0){		// 선택한 좌석이 모두 비어있는 좌석일 경우 => 예매가능
-	// 예매
-	ReservationDAO rdao = ReservationDAO.getInstance();
-	boolean isS = rdao.reserve(rdto); 
-	if(isS){ %>
-		<script type="text/javascript">
-			//alert("예매가 완료되었습니다");
-			location.href = "Done.jsp?mypay=<%=mypay%>";
-		</script>
-	<%}else{ %>
-		<script type="text/javascript">
-			alert("예매에 실패했습니다");
-			location.href = "Seat.jsp";
-		</script>
-	<%} 	
+if(seatcheck==0){		// 선택한 좌석이 모두 비어있는 좌석일 경우 => 예매가능 %>
+	<script type="text/javascript">
+		location.href="<%=url%>";
+	</script>
+<% 	
 }else{					// 선택한 좌석 중에 예약된 좌석이 있는 경우 => 예매 불가능 %>
 	<script type="text/javascript">
 		alert("선택한 좌석 중에 예매 불가능한 좌석이 있습니다");

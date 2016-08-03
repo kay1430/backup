@@ -7,6 +7,7 @@ public interface iReservateionDAO {
 	boolean judgereserve(int seq, String id);
 	int judgepoll(int seq, String id);
 	boolean reserve(ReservationDTO rdto);
+	boolean confirmreserve(ReservationDTO rdto);
 	
 	//bom
 	List<ReservationDTO> getHistoryList(String m_id);

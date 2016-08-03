@@ -338,7 +338,7 @@ public class ReservationDAO implements iReservateionDAO {
 			while(rs.next()){
 				isS = true;		// 해당하는 데이터가 있으면 true
 			}
-			System.out.println("isS:" + isS);
+			//System.out.println("isS:" + isS);
 			
 		}catch(SQLException e){
 			log("Fail judgereserve");
@@ -391,8 +391,8 @@ public class ReservationDAO implements iReservateionDAO {
 	@Override
 	public boolean reserve(ReservationDTO rdto) {
 
-		String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, TO_DATE(?, 'YYYY-MM-DD'), ?, ?) ";
-		//String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, ?, ?, ?) ";
+		String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, TO_DATE(?, 'YYYY-MM-DD HH24:MI'), ?, ?) ";
+		/*String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, TO_DATE(?, 'YYYY-MM-DD'), ?, ?) ";*/
 		
 		Connection conn = null;
 		PreparedStatement psmt = null;
@@ -400,7 +400,7 @@ public class ReservationDAO implements iReservateionDAO {
 		int count = 0;
 		//System.out.println("(method)rdto.getR_viewtime() : "+rdto.getR_viewtime());
 		Date tmp = new Date(rdto.getR_viewtime().getTime());
-		//System.out.println("tmp:" + tmp);
+		System.out.println("tmp:" + tmp);	// YYYY-MM-DD HH24:MI 형태가 되어야함
 		
 		try{
 			conn = DBManager.getConnection();
@@ -435,6 +435,53 @@ public class ReservationDAO implements iReservateionDAO {
 		}
 		
 		return count>0?true:false;
+	}
+
+	// Done.jsp에서 새로고침하면 똑같은 데이터가 여러번 들어가는 문제가 발생하지 않도록 , 확인하는 작업
+	@Override
+	public boolean confirmreserve(ReservationDTO rdto) {
+		
+		//String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, TO_DATE(?, 'YYYY-MM-DD HH24:MI'), ?, ?) ";
+		String sql = " SELECT R_SEQ FROM RESERVATION WHERE M_ID=? AND TH_SEQ=? AND MV_SEQ=? AND R_SEAT=? AND R_VIEWTIME=TO_DATE(?, 'YYYY-MM-DD HH24:MI') ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+		ResultSet rs = null;		
+		
+		boolean result = false;
+		//System.out.println("(method)rdto.getR_viewtime() : "+rdto.getR_viewtime());
+		Date tmp = new Date(rdto.getR_viewtime().getTime());
+		//System.out.println("tmp:" + tmp);	// YYYY-MM-DD HH24:MI 형태가 되어야함
+		
+		try{
+			conn = DBManager.getConnection();
+			log("2/6 Success confirmreserve");
+			
+			psmt = conn.prepareStatement(sql);
+			int i = 1;
+			psmt.setString(i++, rdto.getM_id());
+			psmt.setInt(i++, rdto.getTh_seq());
+			psmt.setInt(i++, rdto.getMv_seq());
+			psmt.setString(i++, rdto.getR_seat());
+			psmt.setDate(i++, tmp);					// timestamp => date
+			log("3/6 Success reseconfirmreserverve");
+			
+			rs = psmt.executeQuery();
+			while(rs.next()){
+				result = true;	// 데이터 존재
+			}
+			log("4/6 Success confirmreserve");
+			
+			
+		}catch(SQLException e){
+			System.out.println(e.getMessage());
+			log("Fail confirmreserve");
+		}finally{
+			DBManager.close(conn, psmt);
+			log("6/6 Success confirmreserve");
+		}
+		
+		return result;
 	}
 	
 	

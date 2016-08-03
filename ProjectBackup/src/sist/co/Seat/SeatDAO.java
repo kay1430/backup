@@ -112,7 +112,7 @@ public class SeatDAO implements ISeat{
 
 	}
 
-	//예매완료하기 직전에 다시한번 seat 예매안된건지 확인
+	//예매완료하기 직전에 다시한번 해당좌석들만 예매안된건지 확인
 	@Override
 	public SeatDTO confirmSeatCheck(int th_seq, String s_name, String s_date) {
 

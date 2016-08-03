@@ -40,11 +40,11 @@ public class TheaterDAO implements ITheater{
 	
 	
 	
-	
+	// sysdate >= th_s_date 이면서 sysdate <= th_e_date 인 Theater data만 불러와야함. 
 	@Override
 	public List<TheaterDTO> getTheaterList(int mv_seq) {
 		
-		String sql = " SELECT * FROM THEATER WHERE MV_SEQ=? ";
+		String sql = " SELECT * FROM THEATER WHERE MV_SEQ=? AND SYSDATE>=TH_S_DATE AND SYSDATE<=TH_E_DATE ORDER BY MV_SEQ ";
 		
 		Connection conn=null;
 		PreparedStatement psmt = null;
@@ -68,8 +68,9 @@ public class TheaterDAO implements ITheater{
 				thdto.setTh_cinema(rs.getString(i++));
 				thdto.setTh_num(rs.getInt(i++));
 				thdto.setTh_totalseat(rs.getInt(i++));
-				thdto.setTh_leftseat(rs.getInt(i++));
 				thdto.setTh_time(rs.getTimestamp(i++));
+				thdto.setTh_s_date(rs.getDate(i++));
+				thdto.setTh_e_date(rs.getDate(i++));
 				
 				thlist.add(thdto);
 			}
@@ -83,8 +84,9 @@ public class TheaterDAO implements ITheater{
 		return thlist;
 	}
 
+	// 상영시간표 출력시 사용 . but, 현재 Reserve.jsp의 getTheaterMatch() 메소드가 대체 (0804)
 	@Override
-	public List<TheaterDTO> getTh_num(int mv_seq, String th_name, String th_cinema) {
+	public List<TheaterDTO> getTh_num(int mv_seq, String th_name, String th_cinema) {	
 		
 		String sql = " SELECT TH_SEQ, TH_NUM, TO_CHAR(TH_TIME, 'YYYY-MM-DD HH24:MI:SS') FROM THEATER WHERE MV_SEQ=? AND TH_NAME=? AND TH_CINEMA=? ";
 		
@@ -146,8 +148,9 @@ public class TheaterDAO implements ITheater{
 				thdto.setTh_cinema(rs.getString(i++));
 				thdto.setTh_num(rs.getInt(i++));
 				thdto.setTh_totalseat(rs.getInt(i++));
-				thdto.setTh_leftseat(rs.getInt(i++));
 				thdto.setTh_time(rs.getTimestamp(i++));
+				thdto.setTh_s_date(rs.getDate(i++));
+				thdto.setTh_e_date(rs.getDate(i++));
 			}
 			
 			
@@ -159,39 +162,6 @@ public class TheaterDAO implements ITheater{
 		return thdto;
 	}
 
-	@Override
-	public boolean reserAfTheater(int th_seq, String s_date) {
-		
-		String sql = " UPDATE THEATER SET TH_LEFTSEAT=TH_LEFTSEAT-1 WHERE TH_SEQ=? AND TH_S_DATE=TO_DATE(?, 'YYYY-MM-DD') ";
-		
-		Connection conn = null;
-		PreparedStatement psmt = null;
-		
-		System.out.println("reserAfTheater s_date: " + s_date);
-		int count = 0;
-		
-		try{
-			conn = DBManager.getConnection();
-			log("2/6 Success reserAfTheater");
-			psmt = conn.prepareStatement(sql);
-			psmt.setInt(1, th_seq);
-			psmt.setString(2, s_date);
-			log("3/6 Success reserAfTheater");
-			
-			count = psmt.executeUpdate();
-			log("4/6 Success reserAfTheater");
-			
-		}catch(SQLException e){
-			System.out.println(e.getMessage());
-			log("Fail reserAfTheater");
-		}finally{
-			DBManager.close(conn, psmt);
-			//log("6/6 Success reserAfTheater");
-		}
-		
-		return count>0?true:false;
-	}
-	
 
 	
 	

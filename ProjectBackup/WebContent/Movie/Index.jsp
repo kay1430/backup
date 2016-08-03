@@ -70,6 +70,8 @@ session.setAttribute("login", mem);
 </table>
 </form>
 
+<%-- admin --%>
+<a href="AddTheater.jsp">AddTheater</a>
 
 </body>
 </html>
