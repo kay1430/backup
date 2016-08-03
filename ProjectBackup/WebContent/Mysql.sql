@@ -1,9 +1,9 @@
- 
+  
 --[1] member
 
 DROP TABLE MEMBER
 CASCADE CONSTRAINT;
-
+ 
 SELECT * FROM MEMBER
 
 CREATE TABLE MEMBER(
@@ -19,7 +19,8 @@ INSERT INTO MEMBER
 VALUES('qwer', 'qwer', 'kwon', 'qwer@qwer')
 INSERT INTO MEMBER
 VALUES('hong', 'hong', 'hong', 'hong@hong')
-
+insert into member
+values('admin','admin','admin','admin@naver.com',1,'admin')
 --[2] movie : MV_LIKE : 좋아요, MV_ON : 상영중인영화
 
 DROP TABLE MOVIE
@@ -47,21 +48,21 @@ START WITH 1 INCREMENT BY 1
 
 INSERT INTO MOVIE
 VALUES(MV_SEQ.NEXTVAL, '부산행', '20160720', '액션', '정체불명의 바이러스가 전국으로 확산되고 대한민국 긴급재난경보령이 선포된 가운데,열차에 몸을 실은 사람들은 단 하나의 안전한 도시 부산까지 살아가기 위한 치열한 사투를 벌이게 된다.'
-, 'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78982/78982_185.jpg', '0', '0', '0', '1')
+, 'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78982/78982_185.jpg', '0', '0', '0', '1');
 
 
 INSERT INTO MOVIE
 VALUES(MV_SEQ.NEXTVAL, '제이슨본', '20160727', '액션,스릴러', '모든 자취를 숨기고 사라졌던 제이슨 본, 그는 되찾은 기억 외에 과거를 둘러싼 또 다른 음모가 있다는 것을 알게 되고 마침내 CIA 앞에 자신의 존재를 드러내게 되는데… 가장 완벽하고 가장 치명적인 무기 ‘제이슨 본’ 이제 모든 것이 그에게 달렸다'
-,'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78981/78981_185.jpg', '0', '0', '0', '1')
+,'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78981/78981_185.jpg', '0', '0', '0', '1');
 
 
 INSERT INTO MOVIE
 VALUES(MV_SEQ.NEXTVAL, '인천상륙작전', '20160727', '드라마, 전쟁', '1950년 6월 25일 북한의 기습 남침으로 불과 사흘 만에 서울 함락, 한 달 만에 낙동강 지역을 제외한 한반도 전 지역을 빼앗기게 된 대한민국. 국제연합군 최고사령관 더글라스 맥아더(리암 니슨)는 모두의 반대 속 인천상륙작전을 계획한다. 성공확률 5000:1, 불가능에 가까운 작전. 이를 가능케 하는 것은 단 하나, 인천으로 가는 길이 확보되어야 하는 것뿐이다. 맥아더의 지시로 대북 첩보작전 X-RAY에 투입된 해군 첩보부대 대위 장학수(이정재)는 북한군으로 위장 잠입해 인천 내 동태를 살피며 정보를 수집하기 시작한다. 하지만 인천 방어사령관 림계진(이범수)에 의해 정체가 발각되는 위기에 놓인 가운데 장학수와 그의 부대원들은 전세를 바꿀 단 한번의 기회, 단 하루의 작전을 위해 인천상륙 함대를 유도하는 위험천만한 임무에 나서는데... 역사를 바꾼 비밀 연합작전 그 시작은 바로 그들이었다! '
-, 'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78994/78994_185.jpg', '0', '0', '0', '1')
+, 'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78994/78994_185.jpg', '0', '0', '0', '1');
 
 INSERT INTO MOVIE
 VALUES(MV_SEQ.NEXTVAL, '도리를찾아서', '20160706', '애니메이션, 어드벤처, 코미디, 가족', '무엇을 상상하든 그 이상을 까먹는 ‘도리’의 어드벤쳐가 시작된다! 니모를 함께 찾으면서 베스트 프렌드가 된 도리와 말린은 우여곡절 끝에 다시 고향으로 돌아가 평화로운 일상을 보내고 있다. 모태 건망증 도리가 ‘기억’이라는 것을 하기 전까지! 도리는 깊은 기억 속에 숨어 있던 가족의 존재를 떠올리고 니모와 말린과 함께 가족을 찾아 대책 없는 어드벤쳐를 떠나게 되는데…깊은 바다도 막을 수 없는 스펙터클한 어드벤쳐가 펼쳐진다! 
-', 'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78907/78907_185.jpg', '0', '0', '0', '1')
+', 'http://img.cgv.co.kr/Movie/Thumbnail/Poster/000078/78907/78907_185.jpg', '0', '0', '0', '1');
 
 
 
@@ -93,22 +94,25 @@ ADD CONSTRAINT FK_THEATER_MV_SEQ FOREIGN KEY(MV_SEQ)
 REFERENCES MOVIE(MV_SEQ);
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 1, 10, 10, to_date('16-07-29 12:30:00','YY-MM-DD HH24:MI:SS'))
+VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 1, 90, 90, to_date('16-07-29 12:30:00','YY-MM-DD HH24:MI:SS'));
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 2, 10, 10, to_date('16-07-29 3:00:00','YY-MM-DD HH24:MI:SS'))
+VALUES(TH_SEQ.NEXTVAL, '명동', 1, '1관', 2, 90, 90, to_date('16-07-29 3:00:00','YY-MM-DD HH24:MI:SS'));
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '명동', 2, '2관', 1, 10, 10, to_date('16-07-29 13:00:00','YY-MM-DD HH24:MI:SS'))
+VALUES(TH_SEQ.NEXTVAL, '명동', 1, '3관', 1, 90, 90, to_date('16-07-29 10:00:00','YY-MM-DD HH24:MI:SS'));
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '대학로', 4, '1관', 1, 10, 10, to_date('16-07-29 15:00:00','YY-MM-DD HH24:MI:SS'))
+VALUES(TH_SEQ.NEXTVAL, '명동', 2, '2관', 1, 90, 90, to_date('16-07-29 13:00:00','YY-MM-DD HH24:MI:SS'));
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '신촌', 3, '1관', 1, 10, 10, to_date('16-07-29 10:00:00','YY-MM-DD HH24:MI:SS'))
+VALUES(TH_SEQ.NEXTVAL, '대학로', 4, '1관', 1, 90, 90, to_date('16-07-29 15:00:00','YY-MM-DD HH24:MI:SS'));
 
 INSERT INTO THEATER
-VALUES(TH_SEQ.NEXTVAL, '강남', 1, '1관', 1, 10, 10, to_date('16-07-29 20:00:00','YY-MM-DD HH24:MI:SS'))
+VALUES(TH_SEQ.NEXTVAL, '신촌', 3, '1관', 1, 90, 90, to_date('16-07-29 10:00:00','YY-MM-DD HH24:MI:SS'));
+
+INSERT INTO THEATER
+VALUES(TH_SEQ.NEXTVAL, '강남', 1, '1관', 1, 90, 90, to_date('16-07-29 20:00:00','YY-MM-DD HH24:MI:SS'));
 
 
 --[4] SEAT : 좌석 수 == COLUMN 수 
