@@ -3,4 +3,7 @@
 -- 디버깅 --
 
 [1]. SNS/ReviewDetail.jsp --> 댓글 수정 누르고 취소할때 해당 회원에 해당되는 모든 댓글에 이벤트발생
-[2]. SNS/ReviewDetail.jsp --> 스마트 에디터 readonly
+ 
+[2]. SNS/ReviewList 페이지  다음 버튼 누르면 5 -> 6으로 갈때만 이벤트 발생
+
+ 

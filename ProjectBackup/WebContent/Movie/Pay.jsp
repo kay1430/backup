@@ -1,3 +1,6 @@
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="sist.co.Seat.SeatDTO"%>
+<%@page import="sist.co.Seat.SeatDAO"%>
 <%@page import="sist.co.Theater.TheaterDTO"%>
 <%@page import="sist.co.Theater.TheaterDAO"%>
 <%@page import="sist.co.Movie.MovieDTO"%>
@@ -49,8 +52,9 @@ MovieDTO mdto = mdao.getmoviedetail(rdto.getMv_seq());
 TheaterDAO thdao = TheaterDAO.getInstance();
 TheaterDTO thdto = thdao.getTheaterinform(rdto.getTh_seq());
 
-
-
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+SeatDAO sdao = SeatDAO.getInstance();
+int leftseat = sdao.cal_leftSeat(rdto.getTh_seq(), sdf.format(rdto.getR_viewtime()));	//잔여석 
 
 %>
 
@@ -86,7 +90,7 @@ TheaterDTO thdto = thdao.getTheaterinform(rdto.getTh_seq());
 				</tr>
 				<tr>
 					<th>잔여석</th>
-					<td colspan="2"><%=thdto.getTh_leftseat() %>석/<%=thdto.getTh_totalseat() %>석</td>
+					<td colspan="2"><%=leftseat %>석/<%=thdto.getTh_totalseat() %>석</td>
 				</tr>
 				<tr>
 					<th>금액</th>

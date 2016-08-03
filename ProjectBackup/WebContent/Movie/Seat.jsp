@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="sist.co.Theater.TheaterDTO"%>
 <%@page import="sist.co.Theater.TheaterDAO"%>
 <%@page import="sist.co.Movie.MovieDTO"%>
@@ -140,8 +141,11 @@ public String[] getRow(List<SeatDTO> slist){	// rowname 추출
 ReservationDTO rdto = (ReservationDTO)session.getAttribute("rdto");
 System.out.println("rdto.getTh_seq():"+rdto.getTh_seq());
 int people = rdto.getR_adult() + rdto.getR_student() + rdto.getR_elder();
+
 SeatDAO sdao = SeatDAO.getInstance();
-List<SeatDTO> slist = sdao.getSeatList(rdto.getTh_seq());
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+int leftseat = sdao.cal_leftSeat(rdto.getTh_seq(), sdf.format(rdto.getR_viewtime()));	//잔여석 
+List<SeatDTO> slist = sdao.getSeatList(rdto.getTh_seq(), sdf.format(rdto.getR_viewtime()));
 String[] rowname = getRow(slist);
 String[] chooseseat = new String[people];	// 선택한 인원수 == 배열 크기  
 
@@ -149,6 +153,7 @@ MovieDAO mdao = MovieDAO.getInstance();
 MovieDTO mdto = mdao.getmoviedetail(rdto.getMv_seq());
 TheaterDAO thdao = TheaterDAO.getInstance();
 TheaterDTO thdto = thdao.getTheaterinform(rdto.getTh_seq());
+
 
 %>
 
@@ -225,7 +230,7 @@ TheaterDTO thdto = thdao.getTheaterinform(rdto.getTh_seq());
 				</tr>
 				<tr>
 					<th>잔여석</th>
-					<td colspan="2"><%=thdto.getTh_leftseat() %>석/<%=thdto.getTh_totalseat() %>석</td>
+					<td colspan="2"><%=leftseat %>석/<%=thdto.getTh_totalseat() %>석</td>
 				</tr>
 				<tr>
 					<th>금액</th>

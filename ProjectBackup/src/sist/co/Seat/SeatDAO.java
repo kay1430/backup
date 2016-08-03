@@ -43,9 +43,9 @@ public class SeatDAO implements ISeat{
 	}
 
 	@Override
-	public List<SeatDTO> getSeatList(int th_seq) {
+	public List<SeatDTO> getSeatList(int th_seq, String s_date) {
 	
-		String sql = " SELECT * FROM SEAT WHERE TH_SEQ=? ORDER BY S_SEQ ";
+		String sql = " SELECT * FROM SEAT WHERE TH_SEQ=? AND S_DATE=TO_DATE(?, 'YYYY-MM-DD') ORDER BY S_SEQ ";
 		
 		Connection conn=null;
 		PreparedStatement pstmt = null;
@@ -57,6 +57,7 @@ public class SeatDAO implements ISeat{
 			conn = DBManager.getConnection();
 			pstmt=conn.prepareStatement(sql);
 			pstmt.setInt(1, th_seq);
+			pstmt.setString(2, s_date);
 
 			rs = pstmt.executeQuery();
 			while(rs.next()){
@@ -65,6 +66,7 @@ public class SeatDAO implements ISeat{
 				sdto.setTh_seq(rs.getInt(2));
 				sdto.setS_name(rs.getString(3));
 				sdto.setS_check(rs.getInt(4));
+				sdto.setS_date(rs.getDate(5));
 				slist.add(sdto);
 			}
 			
@@ -109,6 +111,134 @@ public class SeatDAO implements ISeat{
 		return count>0?true:false;
 
 	}
+
+	//예매완료하기 직전에 다시한번 seat 예매안된건지 확인
+	@Override
+	public SeatDTO confirmSeatCheck(int th_seq, String s_name, String s_date) {
+
+		String sql = " SELECT * FROM SEAT WHERE TH_SEQ=? AND S_NAME=? AND S_DATE=TO_DATE(?, 'YYYY-MM-DD') ";
+		
+		Connection conn=null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		SeatDTO sdto = new SeatDTO();
+		try {
+			conn = DBManager.getConnection();
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, th_seq);
+			pstmt.setString(2, s_name);
+			pstmt.setString(3, s_date);
+			log("3/6 Success confirmSeatCheck");
+			
+			rs = pstmt.executeQuery();
+			log("4/6 Success confirmSeatCheck");
+			while(rs.next()){
+				sdto.setS_seq(rs.getInt(1));
+				sdto.setTh_seq(rs.getInt(2));
+				sdto.setS_name(rs.getString(3));
+				sdto.setS_check(rs.getInt(4));
+				sdto.setS_date(rs.getDate(5));
+			}
+			
+			
+		} catch (SQLException e) {
+			log("Fail confirmSeatCheck");
+		}finally{
+			DBManager.close(conn, pstmt);
+			log("6/6 Success confirmSeatCheck");
+		}
+		
+		return sdto;
+	}
+
+	@Override
+	public boolean reserAfSeat(int s_seq) {
+		
+		String sql = " UPDATE SEAT SET S_CHECK=1 WHERE S_SEQ=? ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+				
+		int count = 0;
+		
+		try{
+			conn = DBManager.getConnection();
+			log("2/6 Success reserAfSeat");
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, s_seq);
+			log("3/6 Success reserAfSeat");
+			count = psmt.executeUpdate();
+			log("4/6 Success reserAfSeat");
+		}catch(SQLException e){
+			log("Fail reserAfSeat");
+		}finally{
+			DBManager.close(conn, psmt);
+			log("6/6 Success reserAfSeat");
+		}
+		
+		return count>0?true:false;
+	}
+
+	// 비어있는 좌석(S_CHECK=0)수 계산. 
+	@Override
+	public int cal_leftSeat(int th_seq, String s_date) {	
+		
+		String sql = " SELECT S_NAME FROM SEAT WHERE TH_SEQ=? AND S_CHECK=0 AND S_DATE=TO_DATE(?, 'YYYY-MM-DD') ORDER BY S_NAME ";
+		
+		Connection conn=null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		int count = 0;
+
+		try {
+			conn = DBManager.getConnection();
+			log("2/6 Success cal_leftSeat");
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, th_seq);
+			pstmt.setString(2, s_date);
+			log("3/6 Success cal_leftSeat");
+			rs = pstmt.executeQuery();
+			while(rs.next()){
+				count++;
+			}
+			log("4/6 Success cal_leftSeat");
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			log("Fail cal_leftSeat");
+		}finally{
+			DBManager.close(conn, pstmt);
+		}
+		
+		return count;
+
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

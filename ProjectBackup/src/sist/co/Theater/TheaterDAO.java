@@ -158,6 +158,39 @@ public class TheaterDAO implements ITheater{
 		}
 		return thdto;
 	}
+
+	@Override
+	public boolean reserAfTheater(int th_seq, String s_date) {
+		
+		String sql = " UPDATE THEATER SET TH_LEFTSEAT=TH_LEFTSEAT-1 WHERE TH_SEQ=? AND TH_S_DATE=TO_DATE(?, 'YYYY-MM-DD') ";
+		
+		Connection conn = null;
+		PreparedStatement psmt = null;
+		
+		System.out.println("reserAfTheater s_date: " + s_date);
+		int count = 0;
+		
+		try{
+			conn = DBManager.getConnection();
+			log("2/6 Success reserAfTheater");
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, th_seq);
+			psmt.setString(2, s_date);
+			log("3/6 Success reserAfTheater");
+			
+			count = psmt.executeUpdate();
+			log("4/6 Success reserAfTheater");
+			
+		}catch(SQLException e){
+			System.out.println(e.getMessage());
+			log("Fail reserAfTheater");
+		}finally{
+			DBManager.close(conn, psmt);
+			//log("6/6 Success reserAfTheater");
+		}
+		
+		return count>0?true:false;
+	}
 	
 
 	

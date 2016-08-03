@@ -1,3 +1,4 @@
+<%@page import="sist.co.Seat.SeatDAO"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <%@page import="sist.co.Reservation.ReservationDTO"%>
@@ -61,14 +62,14 @@ public List<TheaterDTO> getTheaterMatch(List<TheaterDTO> thelist, int seq, Strin
 	}
 	return result;
 }
-public int getleftseat(List<TheaterDTO> thelist, int th_seq){	// 잔여석
+/* public int getleftseat(List<TheaterDTO> thelist, int th_seq){	// 잔여석
 	for(int i = 0; i < thelist.size(); i++){
 		if(th_seq == thelist.get(i).getTh_seq()){
 			return thelist.get(i).getTh_leftseat();
 		}
 	}
 	return -1;
-}
+} */
 public int getPrice(List<PriceDTO> plist, String man){		// 가격표 
 	for(int i = 0; i < plist.size(); i++){
 		if(plist.get(i).getP_grade().equals(man)) 
@@ -208,11 +209,17 @@ List<MovieDTO> mlist = mdao.getOnMovieList();
 // Theater Data 취득
 TheaterDAO thdao = TheaterDAO.getInstance();
 List<TheaterDTO> thlist = thdao.getTheaterList(seq);
+TheaterDTO thdto = thdao.getTheaterinform(th_seq); 
 
+// Seat Data 취득
+String sdata = year+"-"+two(month+"")+"-"+two(sdate+"");
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+SeatDAO sdao = SeatDAO.getInstance();
+int leftseat = sdao.cal_leftSeat(th_seq, sdata);	//잔여석 
 
 // 예매관련 r_time 넣기 위한 작업 => timestamp에 값 못넣겟음. 그래서 그냥 DB에 String식으로 넣는 방식으로 바꿈 (0801 수정할거) => 좌석선택후 이런식으로 넣을꺼임
-/* String s  = year+"-"+two(month+"")+"-"+two(sdate+"")+" "+getChooseTime(thlist, th_seq)+":00";
-System.out.println("s:" + s); */
+String s_inrdto  = year+"-"+two(month+"")+"-"+two(sdate+"")+" "+getChooseTime(thlist, th_seq)+":00";
+System.out.println("s_inrdto:" + s_inrdto); 
 
 // 예매관련
 ReservationDTO rdto = new ReservationDTO();
@@ -229,12 +236,20 @@ rdto.setR_elder(elder);
 } */ 
  /* rdto.setR_viewtime(getTimestamp("2016-08-02 11:00:00")); //yyyy-mm-dd hh:mm:ss형식 */
  /* s = "2016-08-02 11:00:00"; */
-/*  rdto.setR_viewtime(getTimestamp(s));  *///yyyy-mm-dd hh:mm:ss형식
+if(getChooseTime(thlist, th_seq)!= null){
+	rdto.setR_viewtime(getTimestamp(s_inrdto));  //yyyy-mm-dd hh:mm:ss형식
+	System.out.println("rdto.getR_viewtime():" + rdto.getR_viewtime());
+}
+rdto.setR_thname(th_name);
+rdto.setR_cinema(thdto.getTh_cinema()); 
 
-
+ 
 session.setAttribute("rdto", rdto);
 
 %>
+
+<a href="tmpadmin.jsp">tmpadmin</a>	<%-- 임시 좌석 DB insert에 해당. 원래 admin이 하는일 --%>
+
 
 <form action="ReserveAf.jsp">
 <table>
@@ -367,7 +382,12 @@ session.setAttribute("rdto", rdto);
 					<%	if(th_name == null){ %>
 							<td>상영관을 선택하세요</td>
 					<%	}else{ %>
-							<td><%=th_name %></td>
+							<td><%=th_name %>
+							<%if(th_seq==0){ %>
+								</td>
+							<%}else{%>
+								<%=thdto.getTh_cinema() %></td>
+							<%} %>
 					<%	} %>	
 				</tr>
 				<tr>
@@ -396,7 +416,8 @@ session.setAttribute("rdto", rdto);
 					<% if(th_seq == 0){ %>
 							관람시간을 선택하세요
 					<%	}else{ %>
-							<%=getleftseat(thlist, th_seq) %>석
+							<%-- <%=getleftseat(thlist, th_seq) %>석 --%>
+							<%=leftseat %>석
 					<%	}	%>
 					</td>
 				</tr>
@@ -485,7 +506,8 @@ session.setAttribute("rdto", rdto);
 				<tr>
 				<%	for(int i = 1; i < 9; i++){ %>
 						<td align="center">
-						<%	if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다%>
+						<%	//if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다
+							if(i > leftseat){ %>
 								<%=i %>
 						<%	}else{ %>
 								<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=i%>&student=<%=student%>&elder=<%=elder%>"><%=i %></a>
@@ -500,7 +522,8 @@ session.setAttribute("rdto", rdto);
 				<tr>
 				<%	for(int i = 1; i < 9; i++){ %>
 						<td align="center">
-						<%	if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다%>
+						<%	//if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다
+							if(i > leftseat){ %>
 								<%=i %>
 						<%	}else{ %>
 							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=adult%>&student=<%=i%>&elder=<%=elder%>"><%=i %></a>
@@ -515,7 +538,8 @@ session.setAttribute("rdto", rdto);
 				<tr>
 				<%	for(int i = 1; i < 9; i++){ %>
 						<td align="center">
-						<%	if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다%>
+						<%	//if(i > getleftseat(thlist, th_seq)){ // 잔여석보다 큰 수는 선택할 수 없다
+							if(i > leftseat){ %>
 								<%=i %>
 						<%	}else{ %>
 							<a href="Reserve.jsp?seq=<%=seq%>&th_name=<%=th_name%>&date=<%=sdate%>&th_seq=<%=th_seq%>&adult=<%=adult%>&student=<%=student%>&elder=<%=i%>"><%=i %></a>

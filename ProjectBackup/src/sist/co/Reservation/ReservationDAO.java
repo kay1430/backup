@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 
 import oracle.sql.ArrayDescriptor;
@@ -390,12 +391,16 @@ public class ReservationDAO implements iReservateionDAO {
 	@Override
 	public boolean reserve(ReservationDTO rdto) {
 
-		String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, ?, ?, ?) ";
+		String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, TO_DATE(?, 'YYYY-MM-DD'), ?, ?) ";
+		//String sql = " INSERT INTO RESERVATION VALUES(R_SEQ.NEXTVAL, ?, ?, ?, 0, ?, ?, ?, ?, ?, SYSDATE, ?, ?, ?) ";
 		
 		Connection conn = null;
 		PreparedStatement psmt = null;
 				
 		int count = 0;
+		//System.out.println("(method)rdto.getR_viewtime() : "+rdto.getR_viewtime());
+		Date tmp = new Date(rdto.getR_viewtime().getTime());
+		//System.out.println("tmp:" + tmp);
 		
 		try{
 			conn = DBManager.getConnection();
@@ -411,7 +416,8 @@ public class ReservationDAO implements iReservateionDAO {
 			psmt.setInt(i++, rdto.getR_student());
 			psmt.setInt(i++, rdto.getR_elder());
 			psmt.setString(i++, rdto.getR_seat());
-			psmt.setTimestamp(i++, rdto.getR_viewtime());	// (0801수정할거) DATE형에 timestamp형 넣어도 잘 들어가는지 확인해보기
+			//psmt.setTimestamp(i++, rdto.getR_viewtime());	// (0801수정할거) DATE형에 timestamp형 넣어도 잘 들어가는지 확인해보기 : timestamp => date
+			psmt.setDate(i++, tmp);
 			psmt.setString(i++, rdto.getR_thname());
 			psmt.setString(i++, rdto.getR_cinema());
 			log("3/6 Success reserve");
@@ -421,6 +427,7 @@ public class ReservationDAO implements iReservateionDAO {
 			
 			
 		}catch(SQLException e){
+			System.out.println(e.getMessage());
 			log("Fail reserve");
 		}finally{
 			DBManager.close(conn, psmt);

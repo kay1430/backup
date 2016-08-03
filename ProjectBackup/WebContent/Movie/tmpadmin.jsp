@@ -32,18 +32,36 @@ for(int i = 0; i < thdto.getTh_totalseat(); i++){
 	//System.out.print(str);
 	Date mydate = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	boolean isS = sdao.adminSeatSetting(thdto.getTh_seq(), str, sdf.format(mydate));
+	// boolean isS = sdao.adminSeatSetting(thdto.getTh_seq(), str, sdf.format(mydate)); 
+	boolean isS = sdao.adminSeatSetting(thdto.getTh_seq(), str, "2016-08-04");//test용. 나중에 이거 지우기 
 	if(!isS)	break;
 	
-}
+}  
+
+/* for(int i = 63; i < thdto.getTh_totalseat(); i++){	
+	
+	char alpha = 'A';
+	for(int j = 0; j < 10; j++){
+		if(i/10==j)	alpha+=j;
+	}
+	
+	String str = ""+ alpha + ((i%10)+1);
+	//System.out.print(str);
+	Date mydate = new Date();
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	//boolean isS = sdao.adminSeatSetting(thdto.getTh_seq(), str, sdf.format(mydate));
+	boolean isS = sdao.adminSeatSetting(thdto.getTh_seq(), str, "2016-08-04");//test용. 나중에 이거 지우기
+	if(!isS)	break;
+	
+}   */
 %>
 
 tmpadmin
 setting seat
 about <%=rdto.getTh_seq() %>
 
-<a href="Seat.jsp">Back</a>
-
+<a href="Seat.jsp">Seat.jsp</a>
+<a href="Reserve.jsp">Reserve.jsp</a>
 
 </body>
 </html>
