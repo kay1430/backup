@@ -14,6 +14,7 @@
 </head>
 <body>
 <%
+
 ReservationDTO rdto = (ReservationDTO)session.getAttribute("rdto");
 
 TheaterDAO thdao = TheaterDAO.getInstance();

@@ -1,4 +1,4 @@
-<%@page import="java.text.SimpleDateFormat"%>
+
 <%@page import="sist.co.Seat.SeatDTO"%>
 <%@page import="sist.co.Reservation.ReservationDAO"%>
 <%@page import="sist.co.Theater.TheaterDAO"%>
